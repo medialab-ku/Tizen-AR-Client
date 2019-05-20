@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<manifest xmlns="http://tizen.org/ns/packages" api-version="4.0" package="org.example.tizenar" version="1.0.0">
+    <profile name="mobile"/>
+    <ui-application appid="org.example.tizenar" exec="tizenar" multiple="false" nodisplay="false" taskmanage="true" type="capp">
+        <label>tizenar</label>
+        <icon>tizenar.png</icon>
+    </ui-application>
+    <feature name="http://tizen.org/feature/screen.size.all"/>
+</manifest>
