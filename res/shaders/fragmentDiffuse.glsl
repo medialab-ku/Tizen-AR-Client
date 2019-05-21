@@ -47,7 +47,7 @@ uniform mediump vec3 uObjectColor;
 
 void main() 
 {
-	mediump vec3 lightColor = vec3(1.0f, 1.0f, 1.0f);
+	mediump vec3 lightColor = vec3(1.0, 1.0, 1.0);
 
     // ambient
     mediump float ambientStrength = 0.65;

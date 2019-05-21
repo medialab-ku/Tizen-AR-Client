@@ -148,9 +148,11 @@ private:
                 wVector3 normal( Eigen::Vector3f(planeEq(0), planeEq(1), planeEq(2)) );
                 normal.Normalize();
                 if (normal.y < 0) normal = wVector3(-normal.x, -normal.y, -normal.z);
-                Dali::Vector3 z = Dali::Vector3(0, 0, -1).Cross(normal.ToDali());
-				Dali::Vector3 x = normal.ToDali().Cross(z);
-				wQuaternion rotation( Dali::Quaternion(x, normal.ToDali(), z) );
+
+                Dali::Vector3 n = normal.ToDali();
+				Dali::Vector3 z = Dali::Vector3(-1, 0, 0).Cross(n);
+				Dali::Vector3 x = n.Cross(z);
+				wQuaternion rotation( Dali::Quaternion(x, n, z) );
                 //wQuaternion rotation( Dali::Quaternion(Dali::Vector3(0, 1, 0), normal.ToDali()) );
                 mPlane->SetPosition(wVector3(planePos));
                 mPlanePos = wVector3(planePos).ToDali();
@@ -167,7 +169,7 @@ private:
                 float gravity = normal.y > 0 ? -9.81f : 9.81f;
                 mDynamicsWorld->setGravity(normal.ToBullet() * gravity);
 
-                //OnPlaneUpdated();
+                OnPlaneUpdated();
             }
 
             UpdateBackgroundMat(left);
@@ -246,7 +248,9 @@ private:
         {
             // Scene should be started after the main plane is detected.
             mScene->Init();
+            dlog_print(DLOG_DEBUG, "TIZENAR", "scene init");
             mScene->OnStart();
+            dlog_print(DLOG_DEBUG, "TIZENAR", "scene start");
             mSceneStart = true;
             _first = false;
         }

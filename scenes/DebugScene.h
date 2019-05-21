@@ -11,6 +11,7 @@
 #include "Assets.h"
 #include "obj-loader.h"
 #include "Model.h"
+#include <dlog.h>
 
 using namespace std;
 
@@ -50,20 +51,24 @@ class DebugScene : public Scene
               SLAM(slam),
               mLightDir(wVector3(0.2, 1, -0.3))
         {
-
+        	dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene created");
         }
 
         void Init() override
         {
             InitUI();
+            dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene init ui");
             //CreateDebug_MapPoints();
             // Debug_CreateContents();
             //CreateWater();
             CreateFloor();
+            dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene create floor");
             CreateBlocks();
+            dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene create blocks");
             //CreateTorches();
             //CreateParticle();
             CreateApple(wVector3(1,1,1));
+            dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene create apple");
         }
 
         void OnUpdate(double deltaTime) override

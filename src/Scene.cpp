@@ -83,7 +83,7 @@ Scene::OnStart()
 void
 Scene::OnUpdate(double deltaTime)
 {
-    mDynamicsWorld->stepSimulation(deltaTime, 10);
+    mDynamicsWorld->stepSimulation(deltaTime, 3);
     for(auto itr = mListActor.begin(); itr != mListActor.end(); ++itr)
     {
         (*itr)->OnUpdate(deltaTime);
