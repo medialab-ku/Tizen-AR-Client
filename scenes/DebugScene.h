@@ -60,13 +60,13 @@ class DebugScene : public Scene
             dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene init ui");
             //CreateDebug_MapPoints();
             // Debug_CreateContents();
-            //CreateWater();
+            CreateWater();
             CreateFloor();
             dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene create floor");
             CreateBlocks();
             dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene create blocks");
-            //CreateTorches();
-            //CreateParticle();
+            CreateTorches();
+            CreateParticle();
             CreateApple(wVector3(1,1,1));
             dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene create apple");
         }
@@ -74,11 +74,11 @@ class DebugScene : public Scene
         void OnUpdate(double deltaTime) override
         {
             Scene::OnUpdate(deltaTime);
-            //UpdateWater(deltaTime);
+            UpdateWater(deltaTime);
             UpdateFloor();
             UpdateBlocks();
-            // UpdateTorches();
-            // UpdateParticles();
+            UpdateTorches();
+            UpdateParticles();
             // if (SLAM->GetTrackingState() == 2) UpdateDebug_MapPoints();
         }
 
