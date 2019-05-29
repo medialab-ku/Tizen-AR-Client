@@ -6,7 +6,6 @@
 #include "PhysicsActor.h"
 #include "Shader.h"
 #include "PrimitiveModels.h"
-#include "ORB-SLAM2/System.h"
 #include "Particle.h"
 #include "Assets.h"
 #include "obj-loader.h"
@@ -46,9 +45,8 @@ class DebugScene : public Scene
 {
     public:
         DebugScene(Dali::Stage &stage, Dali::CameraActor &camera, Dali::Layer &uiLayer, 
-            btDiscreteDynamicsWorld *dynamicsWorld, FrameActor *plane, ORB_SLAM2::System *slam)
+            btDiscreteDynamicsWorld *dynamicsWorld, FrameActor *plane)
             : Scene(stage, camera, uiLayer, dynamicsWorld, plane),
-              SLAM(slam),
               mLightDir(wVector3(0.2, 1, -0.3))
         {
         	dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene created");
@@ -58,7 +56,6 @@ class DebugScene : public Scene
         {
             InitUI();
             dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene init ui");
-            //CreateDebug_MapPoints();
             // Debug_CreateContents();
             CreateWater();
             CreateFloor();
@@ -79,7 +76,6 @@ class DebugScene : public Scene
             UpdateBlocks();
             UpdateTorches();
             UpdateParticles();
-            // if (SLAM->GetTrackingState() == 2) UpdateDebug_MapPoints();
         }
 
         void OnKeyEvent(const Dali::KeyEvent &event) override
@@ -125,43 +121,6 @@ class DebugScene : public Scene
             mLabel.SetProperty( Dali::Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
             AddUI(mLabel);
             mLabel.SetPosition(Dali::Vector3(0, 0, 0));
-        }
-
-        void CreateDebug_MapPoints()
-        {
-            Dali::Shader cubeShader = LoadShaders("vertexPhong.glsl", "fragmentPhong.glsl");
-            cubeShader.RegisterProperty("uLightPos", Dali::Vector3(1, -1, 1));
-            cubeShader.RegisterProperty("uViewPos", Dali::Vector3(0, 0, 0));
-            cubeShader.RegisterProperty("uLightColor", Dali::Vector3(1, 1, 1));
-
-            PrimitiveTexturedCube cubeModel("wood.png", cubeShader);
-            
-            for(int i = 0; i < 2000; i++)
-            {
-                GraphicsActor* point = new GraphicsActor(mStage, cubeModel);
-                point->SetPosition(0, 0, 3);
-                point->SetSize(0.002, 0.002, 0.002);
-                //AddActor(point);
-                mMapPointActors.push_back(point);
-            }
-        }
-
-        Dali::Vector3 PointFromMP(ORB_SLAM2::MapPoint* mp)
-        {
-            cv::Mat pos = mp->GetWorldPos();
-            Dali::Vector3 point = Dali::Vector3(-pos.at<float>(0), pos.at<float>(1), pos.at<float>(2));
-            return point;
-        }
-
-        void UpdateDebug_MapPoints()
-        {
-            std::vector<ORB_SLAM2::MapPoint*> mp = SLAM->GetMapPoints();
-            for(int i = 0; i < 2000; i++)
-            {
-                if(i == mp.size()) break;
-                Dali::Vector3 point = PointFromMP(mp[i]);
-                mMapPointActors[i]->SetPosition(wVector3(point));
-            }
         }
 
         void Debug_CreateContents()
@@ -350,7 +309,6 @@ class DebugScene : public Scene
         }
 
     private:
-        ORB_SLAM2::System *SLAM;
         Dali::Toolkit::TextLabel mLabel;
         wVector3 mLightDir; // Directional Light
 

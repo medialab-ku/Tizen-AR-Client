@@ -18,6 +18,7 @@
 #include "DebugScene.h"
 #include "RealSense.h"
 #include "FileSystem.h"
+#include "Net.h"
 
 #include <dlog.h>
 #include <sstream>
@@ -42,8 +43,6 @@ public:
         dlog_print(DLOG_DEBUG, "TIZENAR", "asset init");
         InitBullet();
         dlog_print(DLOG_DEBUG, "TIZENAR", "bullet init");
-        InitSLAM();
-        dlog_print(DLOG_DEBUG, "TIZENAR", "slam init");
         mApplication.InitSignal().Connect(this, &TizenRendererSystem::Create);
     }
 
@@ -51,11 +50,6 @@ public:
     {
         mScene->Dispose();
         delete mDynamicsWorld;
-
-        SLAM->SaveTrajectoryTUM(FileSystem::GetDataPath("CameraTrajectory.txt"));
-        SLAM->SaveMapPoints(FileSystem::GetDataPath("MapPoints.txt"));
-        SLAM->SaveDetectedPlane(FileSystem::GetDataPath("Plane.txt"));
-        SLAM->Shutdown();
     }
 
 private:
@@ -101,9 +95,8 @@ private:
 
         CreatePlane();
 
-        mScene = new DebugScene(mStage, mCamera, mUILayer, mDynamicsWorld, mPlane, SLAM);
+        mScene = new DebugScene(mStage, mCamera, mUILayer, mDynamicsWorld, mPlane);
         dlog_print(DLOG_DEBUG, "TIZENAR", "create done");
-        // mScene->Init();
     }
 
     bool Update()
@@ -123,6 +116,7 @@ private:
             mInitTime = std::chrono::high_resolution_clock::now();
             mOldTime = mInitTime;
             mCurrentTime = mInitTime;
+            Net::BeginClient(9999); // blocked until connection
         }
         else
         {
@@ -130,55 +124,98 @@ private:
             mCurrentTime = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> elapsed = mCurrentTime - mOldTime;
             deltaTime = elapsed.count();
-            if(mSeq) sensor.GetImage(left, depth);
-            std::chrono::duration<double> time = mCurrentTime - mInitTime;
 
-            // Camera update
-            UpdateCamera(time);
-            
-            // Plane detection
-            Eigen::Vector4f planeEq;
-            Eigen::Vector3f planePos;
-            int planeInlier;
-            SLAM->GetPlaneDetector()->GetPlane(planeEq, planePos, planeInlier);
-            if(planeInlier >= mPlaneInliers && mUpdatePlane)
+            if(ReceiveData())
             {
-                cout << "calc plane" << endl;
-                dlog_print(DLOG_DEBUG, "TIZENAR", "plane update");
-                wVector3 normal( Eigen::Vector3f(planeEq(0), planeEq(1), planeEq(2)) );
-                normal.Normalize();
-                if (normal.y < 0) normal = wVector3(-normal.x, -normal.y, -normal.z);
-
-                Dali::Vector3 n = normal.ToDali();
-				Dali::Vector3 z = Dali::Vector3(-1, 0, 0).Cross(n);
-				Dali::Vector3 x = n.Cross(z);
-				wQuaternion rotation( Dali::Quaternion(x, n, z) );
-                //wQuaternion rotation( Dali::Quaternion(Dali::Vector3(0, 1, 0), normal.ToDali()) );
-                mPlane->SetPosition(wVector3(planePos));
-                mPlanePos = wVector3(planePos).ToDali();
-                mPlane->SetRotation(rotation);
-                mPlaneRot = rotation.ToDali();
-                mPlaneInliers = planeInlier;
-
-                std::stringstream ss, ss2;
-				ss << "Plane pos : " << mPlanePos;
-				ss2 << "Plane rot : " << mPlaneRot.mVector;
-				dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
-				dlog_print(DLOG_DEBUG, "TIZENAR", ss2.str().c_str());
-
-                float gravity = normal.y > 0 ? -9.81f : 9.81f;
-                mDynamicsWorld->setGravity(normal.ToBullet() * gravity);
-
-                OnPlaneUpdated();
+            	UpdateBackgroundMat(_rgb);
+            	UpdateCamera();
             }
 
-            UpdateBackgroundMat(left);
+            
+            if(mUpdatePlane)
+            {
+            	if(ReceivePlane())
+            	{
+            		cout << "calc plane" << endl;
+					dlog_print(DLOG_DEBUG, "TIZENAR", "plane update");
+					wVector3 normal( Eigen::Vector3f(_planeEq(0), _planeEq(1), _planeEq(2)) );
+					normal.Normalize();
+					if (normal.y < 0) normal = wVector3(-normal.x, -normal.y, -normal.z);
+
+					Dali::Vector3 n = normal.ToDali();
+					Dali::Vector3 z = Dali::Vector3(-1, 0, 0).Cross(n);
+					Dali::Vector3 x = n.Cross(z);
+					wQuaternion rotation( Dali::Quaternion(x, n, z) );
+					//wQuaternion rotation( Dali::Quaternion(Dali::Vector3(0, 1, 0), normal.ToDali()) );
+					mPlane->SetPosition(wVector3(_planePos));
+					mPlanePos = wVector3(_planePos).ToDali();
+					mPlane->SetRotation(rotation);
+					mPlaneRot = rotation.ToDali();
+
+//					std::stringstream ss, ss2;
+//					ss << "Plane pos : " << mPlanePos;
+//					ss2 << "Plane rot : " << mPlaneRot.mVector;
+//					dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+//					dlog_print(DLOG_DEBUG, "TIZENAR", ss2.str().c_str());
+
+					float gravity = normal.y > 0 ? -9.81f : 9.81f;
+					mDynamicsWorld->setGravity(normal.ToBullet() * gravity);
+
+					OnPlaneUpdated();
+            	}
+            }
 
             if(mSceneStart) mScene->Update(deltaTime);
         }
 
         mOldTime = mCurrentTime;
         return true;
+    }
+
+    bool ReceiveData()
+	{
+		if (not Net::IsConnected()) return false;
+		Net::Send(Net::ID_CAM, nullptr, 0);
+		if (not Net::Receive()) return false;
+
+		std::cout << "Receive " << Net::GetTotalLength() << " bytes" << std::endl;
+		char *buf = Net::GetData();
+
+		Net::Mat output_left;
+		Net::Vec3 output_pos;
+		Net::Vec4 output_rot;
+		Net::DecodeCameraData(buf, output_left, output_pos, output_rot);
+
+		// 1. create cv::Mat from received data first
+		_rgb = cv::Mat(SCREEN_HEIGHT, SCREEN_WIDTH, CV_8UC3, output_left.data);
+		// 2. output_left.data will be freed out of this scope
+		// 3. cv::Mat::clone() lets cv::Mat own its buffer so that _rgb will maintain its value
+		_rgb = _rgb.clone();
+
+		_camPos = wVector3( Dali::Vector3(output_pos.x, output_pos.y, output_pos.z) );
+		_camRot = wQuaternion( Dali::Quaternion(output_rot.w, output_rot.x, output_rot.y, output_rot.z) );
+
+		delete[] buf;
+		return true;
+	}
+
+    bool ReceivePlane()
+    {
+    	if (not Net::IsConnected()) return false;
+    	Net::Send(Net::ID_PLANE, nullptr, 0);
+    	if (not Net::Receive()) return false;
+
+    	char *buf = Net::GetData();
+
+    	Net::Vec4 eq;
+    	Net::Vec3 pos;
+    	Net::DecodePlaneData(buf, eq, pos);
+
+    	_planeEq = Eigen::Vector4f(eq.x, eq.y, eq.z, eq.w);
+    	_planePos = Eigen::Vector3f(pos.x, pos.y, pos.z);
+
+    	delete[] buf;
+    	return true;
     }
 
     void OnKeyEvent( const KeyEvent& event )
@@ -190,48 +227,7 @@ private:
             {
                 mApplication.Quit();
             }
-
-            // q pressed
-            if(event.keyCode == 24)
-            {
-                mUpdatePlane = !mUpdatePlane;
-                cout << "plane detection mode changed to" << mUpdatePlane << endl;
-            }
-
-            // s pressed. start the demo scene
-            if(event.keyCode == 39)
-            {
-                mSceneStart = !mSceneStart;
-            }
-
-            // p pressed. stop the image seqence
-            if (event.keyCode == 33)
-            {
-                mSeq = !mSeq;
-            }
-
-            // space pressed. shoot the apple from camera
-            if(event.keyCode == 65)
-            {
-
-            }
-
-            // left
-            if(event.keyCode == 113)
-            {
-                Dali::Vector3 lp = mUILayer.GetCurrentPosition();
-                mUILayer.SetPosition(lp - Dali::Vector3(0, 0, 1));
-                cout << "changed to : " << mUILayer.GetCurrentPosition() << endl;
-            }
-            // right
-            else if(event.keyCode == 114)
-            {
-                Dali::Vector3 lp = mUILayer.GetCurrentPosition();
-                mUILayer.SetPosition(lp + Dali::Vector3(0, 0, 1));
-                cout << "changed to : " << mUILayer.GetCurrentPosition() << endl;
-            }
         }
-
         mScene->OnKeyEvent(event);
     }
 
@@ -256,29 +252,15 @@ private:
         }
     }
 
-    void UpdateCamera(std::chrono::duration<double> time)
+    void UpdateCamera()
     {
-        try
-        {
-            cv::Mat Tcw = SLAM->TrackRGBD(left, depth, time.count());
-            cv::Mat Rwc = Tcw.rowRange(0,3).colRange(0,3).t();
-            cv::Mat twc = -Rwc*Tcw.rowRange(0,3).col(3);
-            vector<float> q = ORB_SLAM2::Converter::toQuaternion(Rwc);
-            wVector3 CameraPos( Eigen::Vector3f(twc.at<float>(0), twc.at<float>(1), twc.at<float>(2)) );
-            wQuaternion CameraRot( Eigen::Vector4f(q[0], q[1], q[2], q[3]) );
-            CameraRot = CameraRot.Inverse(); // ORB-SLAM2 returns C->W. So we need inverse of that quaternion.
-//            std::stringstream ss, ss2;
-//			  ss << "camera pos: " << CameraPos.ToDali();
-//			  ss2 << "camera rot:  " << CameraRot.ToDali().mVector;
-//			  dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
-//			  dlog_print(DLOG_DEBUG, "TIZENAR", ss2.str().c_str());
-            mCamera.SetPosition( CameraPos.ToDali() );
-            mCamera.SetOrientation( CameraRot.ToDali() );
-        }
-        catch(const std::exception& e)
-        {
-            cout << "tracking failed!" << endl;
-        }
+		mCamera.SetPosition( _camPos.ToDali() );
+		mCamera.SetOrientation( _camRot.ToDali() );
+//		std::stringstream ss, ss2;
+//		ss << "camera pos: " << CameraPos.ToDali();
+//		ss2 << "camera rot:  " << CameraRot.ToDali().mVector;
+//		dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+//		dlog_print(DLOG_DEBUG, "TIZENAR", ss2.str().c_str());
     }
 
     void InitBullet()
@@ -289,20 +271,6 @@ private:
         btSequentialImpulseConstraintSolver *solver = new btSequentialImpulseConstraintSolver();
         mDynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, cfg);
         mDynamicsWorld->setGravity(btVector3(0, -9.81, 0));
-    }
-
-    void InitSLAM()
-    {
-        //const string orb = "../res/SLAM/ORB.bin";
-    	const string orb = FileSystem::GetResourcePath("SLAM/ORB.bin");
-        //const string settings = "../res/SLAM/TUM1.yaml";
-        const string settings = FileSystem::GetResourcePath("SLAM/TUM1.yaml");
-        SLAM = new ORB_SLAM2::System(orb, settings, ORB_SLAM2::System::RGBD);
-        dlog_print(DLOG_DEBUG, "TIZENAR", "slam system init");
-
-        //sensor.LoadImages("../res/SLAM/fr1_xyz.txt", "rgbd_dataset_freiburg1_xyz");
-        sensor.LoadImages(FileSystem::GetResourcePath("SLAM/fr1_xyz.txt"), "rgbd_dataset_freiburg1_xyz");
-        dlog_print(DLOG_DEBUG, "TIZENAR", "slam img init");
     }
 
     void InitUILayer()
@@ -342,6 +310,8 @@ private:
 		// mPlane->SetRotation(wQuaternion(Dali::Quaternion(-0.244961, 0.740481, 0.193315, -0.595241)));
     }
 
+
+
 private:
     // Application
     Dali::Application &mApplication;
@@ -351,7 +321,6 @@ private:
     Dali::Stage mStage;
     Dali::CameraActor mCamera;
     Dali::Timer mTimer;
-    bool mSeq = true;
     bool mSceneStart = false;
 
     // UI
@@ -363,7 +332,6 @@ private:
     PhysicsActor* mPlane;
     Dali::Vector3 mPlanePos;
     Dali::Quaternion mPlaneRot;
-    int mPlaneInliers = 0;
     bool mUpdatePlane = true;
 
     // Time 
@@ -371,11 +339,12 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> mOldTime;
     std::chrono::time_point<std::chrono::high_resolution_clock> mInitTime;
 
-    // slam & sensor
-    ORB_SLAM2::System* SLAM;
-    TUM sensor;
-    cv::Mat left, depth;
-    //RealSense realSense;
+    // Data from server
+    wVector3 _camPos;
+    wQuaternion _camRot;
+    Eigen::Vector4f _planeEq;
+    Eigen::Vector3f _planePos;
+    cv::Mat _rgb;
 };
 
 // main function
