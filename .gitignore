@@ -110,7 +110,6 @@ local.properties
 .sign/
 Debug/
 crash-info/
-.exportMap
-.tproject
 res/SLAM/rgbd_dataset_freiburg1_xyz/
-*.ipch
+.vscode/
+SA_Report/
