@@ -26,8 +26,8 @@
 const unsigned int UPDATE_INTERVAL = 64;
 const float Focal_X = 517.306408f;  // TUM
 const float Focal_Y = 516.469215f;  // TUM
-const int SCREEN_WIDTH = 960;
-const int SCREEN_HEIGHT = 720;
+const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 480;
 const float CAMERA_NEAR = 0.001f;
 const float CAMERA_FAR = 2000.0f;
 const float CAMERA_ASPECT = (SCREEN_WIDTH * Focal_Y) / (SCREEN_HEIGHT * Focal_X);
@@ -125,19 +125,19 @@ private:
             std::chrono::duration<double> elapsed = mCurrentTime - mOldTime;
             deltaTime = elapsed.count();
 
-            if(ReceiveData())
+            if(ReceiveCameraData())
             {
             	UpdateBackgroundMat(_rgb);
-            	UpdateCamera();
+				UpdateCamera();
             }
 
-            
-            if(mUpdatePlane)
+            if(ReceivePlaneData())
             {
-            	if(ReceivePlane())
-            	{
-            		cout << "calc plane" << endl;
-					dlog_print(DLOG_DEBUG, "TIZENAR", "plane update");
+            	if(mUpdatePlane)
+				{
+					cout << "calc plane" << endl;
+					dlog_print(DLOG_DEBUG, "TIZENAR", "plane update Eq: %f, %f, %f, %f", _planeEq(0), _planeEq(1), _planeEq(2), _planeEq(3));
+					dlog_print(DLOG_DEBUG, "TIZENAR", "plane update Pos: %f, %f, %f", _planePos(0), _planePos(1), _planePos(2));
 					wVector3 normal( Eigen::Vector3f(_planeEq(0), _planeEq(1), _planeEq(2)) );
 					normal.Normalize();
 					if (normal.y < 0) normal = wVector3(-normal.x, -normal.y, -normal.z);
@@ -162,7 +162,7 @@ private:
 					mDynamicsWorld->setGravity(normal.ToBullet() * gravity);
 
 					OnPlaneUpdated();
-            	}
+				}
             }
 
             if(mSceneStart) mScene->Update(deltaTime);
@@ -172,14 +172,15 @@ private:
         return true;
     }
 
-    bool ReceiveData()
-	{
-		if (not Net::IsConnected()) return false;
+    bool ReceiveCameraData()
+    {
+    	if (not Net::IsConnected()) return false;
 		Net::Send(Net::ID_CAM, nullptr, 0);
 		if (not Net::Receive()) return false;
 
-		std::cout << "Receive " << Net::GetTotalLength() << " bytes" << std::endl;
 		char *buf = Net::GetData();
+
+		if(Net::GetId() != Net::ID_CAM) return false;
 
 		Net::Mat output_left;
 		Net::Vec3 output_pos;
@@ -192,30 +193,33 @@ private:
 		// 3. cv::Mat::clone() lets cv::Mat own its buffer so that _rgb will maintain its value
 		_rgb = _rgb.clone();
 
-		_camPos = wVector3( Dali::Vector3(output_pos.x, output_pos.y, output_pos.z) );
-		_camRot = wQuaternion( Dali::Quaternion(output_rot.w, output_rot.x, output_rot.y, output_rot.z) );
+		_camPos = wVector3( output_pos.x, output_pos.y, output_pos.z );
+		_camRot = wQuaternion( output_rot.x, output_rot.y, output_rot.z, output_rot.w );
+
 
 		delete[] buf;
 		return true;
-	}
+    }
 
-    bool ReceivePlane()
+    bool ReceivePlaneData()
     {
     	if (not Net::IsConnected()) return false;
-    	Net::Send(Net::ID_PLANE, nullptr, 0);
-    	if (not Net::Receive()) return false;
+		Net::Send(Net::ID_PLANE, nullptr, 0);
+		if (not Net::Receive()) return false;
 
-    	char *buf = Net::GetData();
+		char *buf = Net::GetData();
 
-    	Net::Vec4 eq;
-    	Net::Vec3 pos;
-    	Net::DecodePlaneData(buf, eq, pos);
+		if(Net::GetId() != Net::ID_PLANE) return false;
 
-    	_planeEq = Eigen::Vector4f(eq.x, eq.y, eq.z, eq.w);
-    	_planePos = Eigen::Vector3f(pos.x, pos.y, pos.z);
+		Net::Vec4 eq;
+		Net::Vec3 pos;
+		Net::DecodePlaneData(buf, eq, pos);
 
-    	delete[] buf;
-    	return true;
+		_planeEq = Eigen::Vector4f(eq.x, eq.y, eq.z, eq.w);
+		_planePos = Eigen::Vector3f(pos.x, pos.y, pos.z);
+
+		delete[] buf;
+		return true;
     }
 
     void OnKeyEvent( const KeyEvent& event )
@@ -342,8 +346,8 @@ private:
     // Data from server
     wVector3 _camPos;
     wQuaternion _camRot;
-    Eigen::Vector4f _planeEq;
-    Eigen::Vector3f _planePos;
+    Eigen::Vector4f _planeEq = Eigen::Vector4f();
+    Eigen::Vector3f _planePos = Eigen::Vector3f();
     cv::Mat _rgb;
 };
 
