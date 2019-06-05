@@ -23,7 +23,7 @@
 #include <dlog.h>
 #include <sstream>
 
-const unsigned int UPDATE_INTERVAL = 64;
+const unsigned int UPDATE_INTERVAL = 32;
 const float Focal_X = 517.306408f;  // TUM
 const float Focal_Y = 516.469215f;  // TUM
 const int SCREEN_WIDTH = 640;
@@ -56,6 +56,8 @@ private:
     void Create(Dali::Application &application)
     {
     	dlog_print(DLOG_DEBUG, "TIZENAR", "create start");
+    	// application.GetWindow().SetPreferredOrientation(Dali::Window::WindowOrientation::LANDSCAPE);
+
         Dali::Window winHandle = application.GetWindow();
         winHandle.ShowIndicator( Dali::Window::INVISIBLE );
 
@@ -72,6 +74,9 @@ private:
         
         // Camera default transform
         // Initial rotation is (0, 180, 0)
+        unsigned int tc = mStage.GetRenderTaskList().GetTaskCount();
+        dlog_print(DLOG_DEBUG, "TIZENAR", "task count : %d", tc);
+
         mCamera = mStage.GetRenderTaskList().GetTask(0).GetCameraActor();
         mStage.GetRenderTaskList().GetTask(0).SetCullMode( false );
         mCamera.SetNearClippingPlane(CAMERA_NEAR);
@@ -112,6 +117,16 @@ private:
         else if (_updateCount < 2)
         {
             // Second frame right after Dali Actors are initialized
+
+        	// debuging for mvp matrix
+			std::stringstream ss, ss2;
+			Dali::Matrix view = mCamera.GetCurrentProperty<Dali::Matrix>(Dali::CameraActor::Property::VIEW_MATRIX);
+			ss << "view : " << view << endl;
+			Dali::Matrix proj = mCamera.GetCurrentProperty<Dali::Matrix>(Dali::CameraActor::Property::PROJECTION_MATRIX);
+			ss2 << "proj : " << proj << endl;
+			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			dlog_print(DLOG_DEBUG, "TIZENAR", ss2.str().c_str());
+
             ++_updateCount;
             mInitTime = std::chrono::high_resolution_clock::now();
             mOldTime = mInitTime;
@@ -176,7 +191,8 @@ private:
     {
     	if (not Net::IsConnected()) return false;
 		Net::Send(Net::ID_CAM, nullptr, 0);
-		if (not Net::Receive()) return false;
+		while(not Net::Receive());
+		//if (not Net::Receive()) return false;
 
 		char *buf = Net::GetData();
 
@@ -205,7 +221,8 @@ private:
     {
     	if (not Net::IsConnected()) return false;
 		Net::Send(Net::ID_PLANE, nullptr, 0);
-		if (not Net::Receive()) return false;
+		while(not Net::Receive());
+		//if (not Net::Receive()) return false;
 
 		char *buf = Net::GetData();
 

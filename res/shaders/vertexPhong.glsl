@@ -101,5 +101,10 @@ void main()
 	vNormal = (mat3(transpose(inverse(uModelMatrix))) * aNormal);
 	vTexCoord = aTexCoord;
 	
-	gl_Position = uMvpMatrix * vertexPosition;           
+	mediump mat4 landscape = mat4( vec4(0, -1, 0, 0),
+	                               vec4(1,  0, 0, 0),
+	                               vec4(0,  0, 1, 0),
+	                               vec4(0,  0, 0, 1));
+	
+	gl_Position = landscape * uMvpMatrix * vertexPosition;
 }

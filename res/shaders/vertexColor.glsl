@@ -31,5 +31,11 @@ void main()
 	mediump vec4 vertexPosition = vec4(aPosition, 1.0);
 	vertexPosition.xyz *= uSize;
 	vColor = aColor;
-	gl_Position = uMvpMatrix * vertexPosition;           
+	
+	mediump mat4 landscape = mat4( vec4(0, -1, 0, 0),
+	                               vec4(1,  0, 0, 0),
+	                               vec4(0,  0, 1, 0),
+	                               vec4(0,  0, 0, 1));
+	
+	gl_Position = landscape * uMvpMatrix * vertexPosition;
 }

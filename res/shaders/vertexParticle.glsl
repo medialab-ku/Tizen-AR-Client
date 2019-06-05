@@ -45,5 +45,10 @@ void main()
 	vTexCoord = aTexCoord;
 	vColor = aColor;
 	
-	gl_Position = uMvpMatrix * vertexPosition;           
+	mediump mat4 landscape = mat4( vec4(0, -1, 0, 0),
+	                               vec4(1,  0, 0, 0),
+	                               vec4(0,  0, 1, 0),
+	                               vec4(0,  0, 0, 1));
+	
+	gl_Position = landscape * uMvpMatrix * vertexPosition;
 }
