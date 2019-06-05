@@ -109,6 +109,7 @@ local.properties
 
 .sign/
 Debug/
+Release/
 crash-info/
 res/SLAM/rgbd_dataset_freiburg1_xyz/
 .vscode/
