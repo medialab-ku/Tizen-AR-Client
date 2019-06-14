@@ -123,32 +123,41 @@ CameraFrameActor::ScreenToWorld(Dali::Vector2 screen)
     // Make Projection Matrix
     float e00 = 1.0f / tan(fov/2.0f) / aspect;
     float e11 = 1.0f / tan(fov/2.0f);
-    float e22 = far / (far - near);
-    float e23 = (near * far) / (far - near);
+    float e22 = (far + near) / (far - near);
+    float e23 = (2 * near * far) / (far - near);
     float e32 = -1;
     Eigen::Matrix4f projMat;
     projMat << e00, 0, 0, 0,
-            0, e11, 0, 0,
-            0, 0, e22, e23,
-            0, 0, e32, 0;
+                0, e11, 0, 0,
+                0, 0, e22, e23,
+                0, 0, e32, 0;
 
     Eigen::Matrix4f projMatInverse = projMat.inverse();
 
-    // Make View Matrix
-    Eigen::Quaternionf quat(rot.w, rot.x, rot.y, rot.z);
-    Eigen::Matrix3f rotMat = quat.matrix();
-    Eigen::Vector3f u = -rotMat.row(0);
-    Eigen::Vector3f v = rotMat.row(1);
-    Eigen::Vector3f n = -rotMat.row(2);
-    Eigen::Vector3f eye = Eigen::Vector3f(pos.x, pos.y, pos.z);
-    float eye_u = eye.dot(u);
-    float eye_v = eye.dot(v);
-    float eye_n = eye.dot(n);
+    Dali::Matrix viewDali;
+    viewDali = mCameraActor.GetCurrentProperty<Dali::Matrix>(Dali::CameraActor::Property::VIEW_MATRIX);
+    float* v_arr = viewDali.AsFloat();
     Eigen::Matrix4f viewMat;
-    viewMat << u.x(), u.y(), u.z(), -eye_u,
-            v.x(), v.y(), v.z(), -eye_v,
-            n.x(), n.y(), n.z(), -eye_n,
-            0, 0, 0, 1;
+    viewMat <<  -v_arr[0], -v_arr[4], -v_arr[8], -v_arr[12],
+                -v_arr[1], -v_arr[5], -v_arr[9], -v_arr[13],
+                -v_arr[2], -v_arr[6], -v_arr[10], -v_arr[14],
+                v_arr[3], v_arr[7], v_arr[11], v_arr[15];
+
+    // Make View Matrix
+    // Eigen::Quaternionf quat(rot.w, rot.x, rot.y, rot.z);
+    // Eigen::Matrix3f rotMat = quat.matrix();
+    // Eigen::Vector3f u = -rotMat.row(0);
+    // Eigen::Vector3f v = rotMat.row(1);
+    // Eigen::Vector3f n = -rotMat.row(2);
+    // Eigen::Vector3f eye = Eigen::Vector3f(pos.x, pos.y, pos.z);
+    // float eye_u = eye.dot(u);
+    // float eye_v = eye.dot(v);
+    // float eye_n = eye.dot(n);
+    // Eigen::Matrix4f viewMat;
+    // viewMat <<  u.x(), u.y(), u.z(), -eye_u,
+    //             v.x(), v.y(), v.z(), -eye_v,
+    //             n.x(), n.y(), n.z(), -eye_n,
+    //             0, 0, 0, 1;
 
     Eigen::Matrix4f viewMatInverse = viewMat.inverse();
 
@@ -158,9 +167,9 @@ CameraFrameActor::ScreenToWorld(Dali::Vector2 screen)
     float y = -(2.0 * screen.y / screenSize.y - 1); // I don't know why it need to be negated
     std::cout << "screen [" << x << ", " << y << "]" << std::endl;
 
-    Eigen::Vector4f start_proj = Eigen::Vector4f(x, -y, 0, 1);
+    Eigen::Vector4f start_proj = Eigen::Vector4f(x, y, 1, 1);
     // (end - start) will be ray direction
-    Eigen::Vector4f end_proj = Eigen::Vector4f(x, -y, -1, 1);
+    Eigen::Vector4f end_proj = Eigen::Vector4f(x, y, -1, 1);
     start_proj *= near;
     end_proj *= far;
 
@@ -183,8 +192,8 @@ CameraFrameActor::ScreenToWorld(Dali::Vector2 screen)
     btVector3 dir = wVector3(dir_dali).ToBullet();
 
     ScreenToWorldResult result;
-    result.worldPos = wVector3(from);
-    result.direction = wVector3(dir);
+    result.worldPos = wVector3(-from.y(), from.x(), from.z());
+    result.direction = wVector3(-dir.y(), dir.x(), dir.z());
 
     return result;
 }

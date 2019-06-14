@@ -23,7 +23,7 @@
 #include <dlog.h>
 #include <sstream>
 
-const unsigned int UPDATE_INTERVAL = 32;
+const unsigned int UPDATE_INTERVAL = 50;
 const float Focal_X = 517.306408f;  // TUM
 const float Focal_Y = 516.469215f;  // TUM
 const int SCREEN_WIDTH = 640;
