@@ -34,6 +34,8 @@ public:
     void RemoveChild(FrameActor *child);
     void Unparent();
 
+    virtual void OnSpaceUpdated(FrameActor *plane, wVector3 basisX, wVector3 basisY, wVector3 basisZ, wVector3 origin);
+
     /*
      * Called at first frame right after the Dali::Actor is initialized.
      * Precisely, it is second frame since the system begun.
@@ -53,8 +55,10 @@ protected:
     wVector3 mPosition;
     wQuaternion mRotation;
     wVector3 mSize;
-    std::list<FrameActor*> mChilds;
-    FrameActor *mParent;
+    FrameActor *_parent;
+    FrameActor *_plane;
+    wVector3 _spaceBasisX, _spaceBasisY, _spaceBasisZ;
+    wVector3 _spaceOrigin;
 };
 
 #endif

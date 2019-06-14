@@ -7,12 +7,14 @@
 
 std::map<std::string, Dali::PixelData> Assets::mImgs;
 std::map<std::string, ObjLoader> Assets::mObjs;
+std::map<std::string, std::string> Assets::_shaderCodes;
 
 void
 Assets::Init()
 {
     LoadAllTextures();
     LoadAllObjs();
+    LoadAllShaders();
 }
 
 void
@@ -89,6 +91,44 @@ Assets::LoadAllObjs()
     closedir(dir);
 }
 
+void
+Assets::LoadAllShaders()
+{
+    std::string shader_path = FileSystem::GetResourcePath("shaders/");
+    struct dirent *entry;
+
+    std::cout << "[Loading shaders...]" << std::endl;
+    DIR *dir = opendir(shader_path.c_str());
+    if (dir == NULL)
+    {
+        return;
+    }
+    while ((entry = readdir(dir)) != NULL)
+    {
+        try
+        {
+            if (entry->d_name[0] == '.') continue;
+            std::cout << entry->d_name << std::endl;
+            std::string full_path = shader_path + std::string(entry->d_name);
+
+            std::ifstream file;
+            std::stringstream stream;
+            file.exceptions (std::ifstream::failbit | std::ifstream::badbit);
+            file.open(full_path.c_str());
+		    stream << file.rdbuf();
+		    file.close();
+
+            _shaderCodes.insert(std::make_pair(std::string(entry->d_name), stream.str()));
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
+        }
+    }
+
+    closedir(dir);
+}
+
 bool
 Assets::GetTexture(std::string name, Dali::Texture &buff)
 {
@@ -117,4 +157,22 @@ Assets::GetObj(std::string name, ObjLoader &buff)
         buff = mObjs.find(name)->second;
         return true;
     }
+}
+
+bool
+Assets::GetShader(const std::string vertName, const std::string fragName, Dali::Shader &buff)
+{
+    if (_shaderCodes.count(vertName) == 0
+        || _shaderCodes.count(fragName) == 0)
+    {
+        return false;
+    }
+    else
+    {
+        auto vertCode = _shaderCodes.find(vertName)->second;
+        auto fragCode = _shaderCodes.find(fragName)->second;
+        buff = Dali::Shader::New(vertCode.c_str(), fragCode.c_str());
+        return true;
+    }
+
 }

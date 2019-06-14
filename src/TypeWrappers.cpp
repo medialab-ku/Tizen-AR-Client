@@ -1,5 +1,14 @@
 #include "TypeWrappers.h"
 
+wVector3 wVector3::zero(0, 0, 0);
+wVector3 wVector3::one(1, 1, 1);
+wVector3 wVector3::right(1, 0, 0);
+wVector3 wVector3::left(-1, 0, 0);
+wVector3 wVector3::up(0, 1, 0);
+wVector3 wVector3::down(0, -1, 0);
+wVector3 wVector3::forward(0, 0, 1);
+wVector3 wVector3::back(0, 0, -1);
+
 wVector3::wVector3()
     : x(0.0f), y(0.0f), z(0.0f)
 {
@@ -59,6 +68,12 @@ wVector3
 wVector3::operator* (const float k) const
 {
     return wVector3(x*k, y*k, z*k);
+}
+
+wVector3
+wVector3::operator- () const
+{
+    return wVector3(-x, -y, -z);
 }
 
 float

@@ -6,20 +6,31 @@
 #include <bullet/btBulletDynamicsCommon.h>
 #include <list>
 #include "FrameActor.h"
+#include "GraphicsActor.h"
 #include "CameraFrameActor.h"
+#include "PrimitiveModels.h"
+#include "Assets.h"
+
+class PlaneActor : public GraphicsActor
+{
+	public:
+		PlaneActor(Dali::Stage &stage, Model &model);
+		void OnSpaceUpdated(FrameActor *plane, wVector3 basisX, wVector3 basisY, wVector3 basisZ, wVector3 origin) override;
+};
 
 class Scene
 {
     public:
-        Scene(Dali::Stage &stage, Dali::CameraActor &camera, Dali::Layer &uiLayer, 
-            btDiscreteDynamicsWorld *dynamicsWorld, FrameActor *plane);
-        void Update(double deltaTime);
+        Scene(Dali::Stage &stage, Dali::CameraActor &camera, Dali::Layer &uiLayer,
+                    btDiscreteDynamicsWorld *dynamicsWorld);
+        virtual void Start();
+        virtual void Update(double deltaTime, wVector3 planeNormal, wVector3 planeOrigin, wVector3 cameraPos, wQuaternion cameraRot);
+        virtual void KeyEvent(const Dali::KeyEvent &event);
+        virtual void Touch(Dali::Actor actor, const Dali::TouchData &touch);
 
-    public:
-        virtual void Init() = 0;
+    protected:
         virtual void OnStart();
         virtual void OnUpdate(double deltaTime);
-        virtual void Dispose();
         virtual void OnKeyEvent(const Dali::KeyEvent &event);
         virtual void OnTouch(Dali::Actor actor, const Dali::TouchData &touch);
 
@@ -27,6 +38,11 @@ class Scene
         void AddActor(FrameActor *actor);
         void RemoveActor(FrameActor *actor);
         void AddUI(Dali::Actor &ui);    // todo : Wrap with FrameActor
+
+    private:
+        void _UpdatePlane(wVector3 planeNormal, wVector3 planeOrigin);
+		void _UpdateCamera(wVector3 cameraPos, wQuaternion cameraRot);
+		void _UpdateWorld(double deltaTime, wVector3 planeNormal);
 
     protected:
         // Essentials
@@ -37,6 +53,8 @@ class Scene
         Dali::Layer mUILayer;
         FrameActor *mPlane;
         CameraFrameActor *mCamera;
+        wVector3 _basisX, _basisY, _basisZ;
+        wVector3 _origin;
 };
 
 #endif

@@ -45,45 +45,68 @@ class DebugScene : public Scene
 {
     public:
         DebugScene(Dali::Stage &stage, Dali::CameraActor &camera, Dali::Layer &uiLayer, 
-            btDiscreteDynamicsWorld *dynamicsWorld, FrameActor *plane)
-            : Scene(stage, camera, uiLayer, dynamicsWorld, plane),
+            btDiscreteDynamicsWorld *dynamicsWorld)
+            : Scene(stage, camera, uiLayer, dynamicsWorld),
               mLightDir(wVector3(0.2, 1, -0.3))
         {
         	dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene created");
-        }
-
-        void Init() override
-        {
-            InitUI();
-            dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene init ui");
-            // Debug_CreateContents();
-            CreateWater();
-            CreateFloor();
-            dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene create floor");
-            CreateBlocks();
-            dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene create blocks");
-            CreateTorches();
-            CreateParticle();
-            CreateApple(wVector3(1,1,1));
-            dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene create apple");
+        	InitUI();
+			dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene init ui");
+			// Debug_CreateContents();
+//			CreateWater();
+//			CreateFloor();
+//			dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene create floor");
+//			CreateBlocks();
+//			dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene create blocks");
+//			CreateTorches();
+//			CreateParticle();
+//			CreateApple(wVector3(1,1,1));
+//			dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene create apple");
+			Test();
         }
 
         void OnUpdate(double deltaTime) override
         {
-            Scene::OnUpdate(deltaTime);
-            UpdateWater(deltaTime);
-            UpdateFloor();
-            UpdateBlocks();
-            UpdateTorches();
-            UpdateParticles();
+//            UpdateWater(deltaTime);
+//            UpdateFloor();
+//            UpdateBlocks();
+//            UpdateTorches();
+//            UpdateParticles();
         }
 
         void OnKeyEvent(const Dali::KeyEvent &event) override
         {
-            if( event.state == KeyEvent::Down )
-            {
-                
-            }
+        	static bool _state = true;
+
+			if( event.state == KeyEvent::Down )
+			{
+				// s pressed
+				if (event.keyCode == 39)
+				{
+					if(_state)
+					{
+						_parent->AddChild(_child);
+					}
+					else
+					{
+						_parent->RemoveChild(_child);
+					}
+
+					_state = not _state;
+				}
+
+				// a pressed
+				if (event.keyCode == 38)
+				{
+					_parent->RotateBy(wQuaternion(Dali::Quaternion(Radian(0), Radian(Degree(90)), Radian(0))));
+				}
+
+				// d pressed
+				if (event.keyCode == 40)
+				{
+					_child->RotateBy(wQuaternion(Dali::Quaternion(Radian(0), Radian(Degree(90)), Radian(0))));
+				}
+			}
         }
 
         void OnTouch(Dali::Actor actor, const Dali::TouchData &touch) override
@@ -308,6 +331,24 @@ class DebugScene : public Scene
             mAppleShader.RegisterProperty("uViewPos", mCamera->GetPosition().ToDali());
         }
 
+        void Test()
+        {
+        	Dali::Shader shader;
+			if (not Assets::GetShader("vertexColor.glsl", "fragmentColor.glsl", shader))
+				std::cout << "Failed to load shader." << std::endl;
+			shader.RegisterProperty("uAlpha", 1.0f);
+			PrimitiveCube model("wood.png", shader);
+			_parent = new GraphicsActor(mStage, model);
+			_parent->SetPosition(-0.1, 0.02, 0);
+			_parent->SetSize(0.02, 0.02, 0.02);
+			AddActor(_parent);
+
+			_child = new GraphicsActor(mStage, model);
+			_child->SetPosition(0.1, 0.02, 0);
+			_child->SetSize(0.02, 0.02, 0.02);
+			AddActor(_child);
+        }
+
     private:
         Dali::Toolkit::TextLabel mLabel;
         wVector3 mLightDir; // Directional Light
@@ -330,6 +371,9 @@ class DebugScene : public Scene
         // Objs
         Dali::Shader mTorchShader;
         Dali::Shader mAppleShader;
+
+        FrameActor *_parent;
+        FrameActor *_child;
 };
 
 #endif

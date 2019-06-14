@@ -3,8 +3,10 @@
 
 #include "Model.h"
 #include "obj-loader.h"
+#include <fstream>
 using namespace Dali;
 
+namespace {
 const char *VERTEX_SHADER = DALI_COMPOSE_SHADER(
     attribute mediump vec3 aPosition;\n        // DALi shader builtin
         attribute mediump vec3 aColor;\n       // DALi shader builtin
@@ -109,19 +111,6 @@ static const unsigned short texCubeIndex[] = {
     35, 33, 34 
 };
 
-static Vertex_Textured planeVertices[] = {
-	{Vector3(1.0f, 0.0f, 1.0f),   Vector2(1.0, 1.0), Vector3(0.0, -1.0, 0.0)},
-	{Vector3(-1.0f, 0.0f, -1.0f), Vector2(0.0, 0.0), Vector3(0.0, -1.0, 0.0)},
-	{Vector3(1.0f, 0.0f, -1.0f),  Vector2(1.0, 0.0), Vector3(0.0, -1.0, 0.0)},
-	{Vector3(-1.0f, 0.0f, 1.0f),  Vector2(0.0, 1.0), Vector3(0.0, -1.0, 0.0)},
-};
-
-static const unsigned short planeIndex[] = {
-	2, 1, 0,
-	0, 1, 3,
-	3, 1, 0,
-	0, 1, 2
-};
 
 struct Vertex
     {
@@ -136,7 +125,7 @@ struct Vertex
     const Vector3 COLOR4( 0.0f, 0.0f, 1.0f );
     const Vector3 COLOR5( 1.0f, 0.0f, 0.0f );
 
-    Vertex vertices[] = {
+    Vertex cubeVertices[] = {
       { Vector3(  1.0f,-1.0f,-1.0f ), COLOR5 },
       { Vector3( -1.0f, 1.0f,-1.0f ), COLOR5 },
       { Vector3(  1.0f, 1.0f,-1.0f ), COLOR5 },
@@ -175,21 +164,12 @@ struct Vertex
       { Vector3( -1.0f, 1.0f, 1.0f ), COLOR2 },
     };
 
-    // create indices
-//    const unsigned short INDEX_CUBE[] = {
-//       2, 1, 0,
-//       5, 4, 3,
-//       8, 7, 6,
-//       11, 10, 9,
-//       14, 13, 12,
-//       17, 16, 15,
-//       20, 19, 18,
-//       23, 22, 21,
-//       26, 25, 24,
-//       29, 28, 27,
-//       32, 31, 30,
-//       35, 34, 33
-//    };
+    Vertex planeVertices[] = {
+          { Vector3(1.0f, 0.0f, 1.0f),   COLOR0 },
+          { Vector3(-1.0f, 0.0f, -1.0f), COLOR1 },
+          { Vector3(1.0f, 0.0f, -1.0f),  COLOR2 },
+          { Vector3(-1.0f, 0.0f, 1.0f),  COLOR3 },
+        };
 
     const unsigned short INDEX_CUBE[] = {
       2, 0, 1,
@@ -206,6 +186,13 @@ struct Vertex
       35, 33, 34
     };
 
+    const unsigned short INDEX_PLANE[] = {
+          2, 1, 0,
+          0, 1, 3,
+          3, 1, 0,
+          0, 1, 2
+        };
+
 class PrimitiveCube : public Model
 {
 public:
@@ -217,7 +204,7 @@ public:
     	                                                       .Add( "aPosition", Property::VECTOR3 )
     	                                                       .Add( "aColor", Property::VECTOR3 ) );
 
-    	vertexBuffer.SetData( vertices, sizeof(vertices) / sizeof(Vertex) );
+    	vertexBuffer.SetData( cubeVertices, sizeof(cubeVertices) / sizeof(Vertex) );
 		Geometry geometry = Geometry::New();
     	geometry.AddVertexBuffer( vertexBuffer );
     	geometry.SetIndexBuffer( INDEX_CUBE,
@@ -256,16 +243,15 @@ public:
     PrimitivePlane(std::string textureName, Dali::Shader &shader)
 		: Model(shader)
     {
-        AddTexture(0, textureName);
-        PropertyBuffer vertexBuffer = PropertyBuffer::New( Property::Map()
+    	AddTexture(0, textureName);
+		PropertyBuffer vertexBuffer = PropertyBuffer::New( Property::Map()
 															   .Add( "aPosition", Property::VECTOR3 )
-															   .Add( "aTexCoord", Property::VECTOR2 )
-															   .Add( "aNormal", Property::VECTOR3 )  );
-	    vertexBuffer.SetData( planeVertices, sizeof(planeVertices) / sizeof(Vertex_Textured) );
-	    Geometry geometry = Geometry::New();
-	    geometry.AddVertexBuffer( vertexBuffer );
-	    geometry.SetIndexBuffer( planeIndex, sizeof(planeIndex)/sizeof(planeIndex[0]) );
-	    geometry.SetType( Geometry::TRIANGLES );
+															   .Add( "aColor", Property::VECTOR3 )  );
+		vertexBuffer.SetData( planeVertices, sizeof(planeVertices) / sizeof(Vertex) );
+		Geometry geometry = Geometry::New();
+		geometry.AddVertexBuffer( vertexBuffer );
+		geometry.SetIndexBuffer( INDEX_PLANE, sizeof(INDEX_PLANE)/sizeof(INDEX_PLANE[0]) );
+		geometry.SetType( Geometry::TRIANGLES );
 
 		SetGeometry(geometry);
     }
@@ -305,5 +291,5 @@ public:
 		SetGeometry(geometry);
     }
 };
-
+}
 #endif

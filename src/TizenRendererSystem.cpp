@@ -48,7 +48,6 @@ public:
 
     void Dispose()
     {
-        mScene->Dispose();
         delete mDynamicsWorld;
     }
 
@@ -98,9 +97,7 @@ private:
 		mTimer.Start();
 		dlog_print(DLOG_DEBUG, "TIZENAR", "timer start");
 
-        CreatePlane();
-
-        mScene = new DebugScene(mStage, mCamera, mUILayer, mDynamicsWorld, mPlane);
+        mScene = new DebugScene(mStage, mCamera, mUILayer, mDynamicsWorld);
         dlog_print(DLOG_DEBUG, "TIZENAR", "create done");
     }
 
@@ -118,20 +115,13 @@ private:
         {
             // Second frame right after Dali Actors are initialized
 
-        	// debuging for mvp matrix
-			std::stringstream ss, ss2;
-			Dali::Matrix view = mCamera.GetCurrentProperty<Dali::Matrix>(Dali::CameraActor::Property::VIEW_MATRIX);
-			ss << "view : " << view << endl;
-			Dali::Matrix proj = mCamera.GetCurrentProperty<Dali::Matrix>(Dali::CameraActor::Property::PROJECTION_MATRIX);
-			ss2 << "proj : " << proj << endl;
-			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
-			dlog_print(DLOG_DEBUG, "TIZENAR", ss2.str().c_str());
-
             ++_updateCount;
             mInitTime = std::chrono::high_resolution_clock::now();
             mOldTime = mInitTime;
             mCurrentTime = mInitTime;
             Net::BeginClient(9999); // blocked until connection
+
+            mScene->Start();
         }
         else
         {
@@ -140,10 +130,11 @@ private:
             std::chrono::duration<double> elapsed = mCurrentTime - mOldTime;
             deltaTime = elapsed.count();
 
+            wVector3 normal, origin;
+
             if(ReceiveCameraData())
             {
             	UpdateBackgroundMat(_rgb);
-				UpdateCamera();
             }
 
             if(ReceivePlaneData())
@@ -153,34 +144,14 @@ private:
 					cout << "calc plane" << endl;
 					dlog_print(DLOG_DEBUG, "TIZENAR", "plane update Eq: %f, %f, %f, %f", _planeEq(0), _planeEq(1), _planeEq(2), _planeEq(3));
 					dlog_print(DLOG_DEBUG, "TIZENAR", "plane update Pos: %f, %f, %f", _planePos(0), _planePos(1), _planePos(2));
-					wVector3 normal( Eigen::Vector3f(_planeEq(0), _planeEq(1), _planeEq(2)) );
+					normal = wVector3( Eigen::Vector3f(_planeEq(0), _planeEq(1), _planeEq(2)) );
 					normal.Normalize();
-					if (normal.y < 0) normal = wVector3(-normal.x, -normal.y, -normal.z);
-
-					Dali::Vector3 n = normal.ToDali();
-					Dali::Vector3 z = Dali::Vector3(-1, 0, 0).Cross(n);
-					Dali::Vector3 x = n.Cross(z);
-					wQuaternion rotation( Dali::Quaternion(x, n, z) );
-					//wQuaternion rotation( Dali::Quaternion(Dali::Vector3(0, 1, 0), normal.ToDali()) );
-					mPlane->SetPosition(wVector3(_planePos));
-					mPlanePos = wVector3(_planePos).ToDali();
-					mPlane->SetRotation(rotation);
-					mPlaneRot = rotation.ToDali();
-
-//					std::stringstream ss, ss2;
-//					ss << "Plane pos : " << mPlanePos;
-//					ss2 << "Plane rot : " << mPlaneRot.mVector;
-//					dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
-//					dlog_print(DLOG_DEBUG, "TIZENAR", ss2.str().c_str());
-
-					float gravity = normal.y > 0 ? -9.81f : 9.81f;
-					mDynamicsWorld->setGravity(normal.ToBullet() * gravity);
-
-					OnPlaneUpdated();
+					if (normal.y > 0) normal = -normal;
+					origin = wVector3(_planePos);
 				}
             }
 
-            if(mSceneStart) mScene->Update(deltaTime);
+            mScene->Update(deltaTime, normal, origin, _camPos, _camRot);
         }
 
         mOldTime = mCurrentTime;
@@ -249,39 +220,13 @@ private:
                 mApplication.Quit();
             }
         }
-        mScene->OnKeyEvent(event);
+        mScene->KeyEvent(event);
     }
 
     bool OnTouch(Dali::Actor actor, const Dali::TouchData &touch)
     {
-        mScene->OnTouch(actor, touch);
+        mScene->Touch(actor, touch);
         return true;
-    }
-
-    void OnPlaneUpdated()
-    {
-        static bool _first = true;
-        if (_first)
-        {
-            // Scene should be started after the main plane is detected.
-            mScene->Init();
-            dlog_print(DLOG_DEBUG, "TIZENAR", "scene init");
-            mScene->OnStart();
-            dlog_print(DLOG_DEBUG, "TIZENAR", "scene start");
-            mSceneStart = true;
-            _first = false;
-        }
-    }
-
-    void UpdateCamera()
-    {
-		mCamera.SetPosition( _camPos.ToDali() );
-		mCamera.SetOrientation( _camRot.ToDali() );
-//		std::stringstream ss, ss2;
-//		ss << "camera pos: " << CameraPos.ToDali();
-//		ss2 << "camera rot:  " << CameraRot.ToDali().mVector;
-//		dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
-//		dlog_print(DLOG_DEBUG, "TIZENAR", ss2.str().c_str());
     }
 
     void InitBullet()
@@ -313,24 +258,6 @@ private:
         mUILayer.SetPosition(Dali::Vector3(0, 0, cameraZ));
     }
 
-    void CreatePlane()
-    {
-        mPlaneShader = LoadShaders("vertexColor.glsl", "fragmentColor.glsl");
-        mPlaneShader.RegisterProperty("uAlpha", 0.3f);
-
-
-        PrimitiveCube floorModel("wood.png", mPlaneShader);
-        
-        mPlane = new PhysicsActor(mStage, floorModel, mDynamicsWorld);
-        mPlane->SetName("Plane");
-        mPlane->SetPosition(0, 0, 0);
-        mPlane->SetSize( 1, 0.05, 1 );
-
-        // plane position for debugging
-		// mPlane->SetPosition(wVector3(Dali::Vector3(0.0504673, 0.0932271, 1.283)));
-		// mPlane->SetRotation(wQuaternion(Dali::Quaternion(-0.244961, 0.740481, 0.193315, -0.595241)));
-    }
-
 
 
 private:
@@ -348,11 +275,6 @@ private:
     Dali::Toolkit::Control mUIControl;
     Dali::Layer mUILayer;
 
-    // Plane
-    Dali::Shader mPlaneShader;
-    PhysicsActor* mPlane;
-    Dali::Vector3 mPlanePos;
-    Dali::Quaternion mPlaneRot;
     bool mUpdatePlane = true;
 
     // Time 

@@ -26,8 +26,12 @@ public:
     wVector3 operator+(const wVector3&) const;
     wVector3 operator-(const wVector3&) const;
     wVector3 operator*(const float) const;
+    wVector3 operator-() const;
     float Length() const;
     wVector3 Normalize();
+
+    static wVector3 zero, one;
+    static wVector3 right, left, up, down, forward, back;
 
 public:
     float x, y, z;

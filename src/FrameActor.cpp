@@ -3,8 +3,12 @@
 
 FrameActor::FrameActor(Dali::Stage &stage)
     : mStage(stage),
-      mChilds(),
-      mParent(nullptr)
+	  _spaceBasisX(wVector3::right),
+	  _spaceBasisY(wVector3::up),
+	  _spaceBasisZ(wVector3::forward),
+	  _spaceOrigin(wVector3::zero),
+      _parent(nullptr),
+	  _plane(nullptr)
 {
     mActor = Dali::Actor::New();
     mActor.SetAnchorPoint(Dali::AnchorPoint::CENTER);
@@ -39,8 +43,7 @@ FrameActor::SetPosition(float x, float y, float z)
 void
 FrameActor::SetPosition(wVector3 position)
 {
-    mPosition = position;
-    mActor.SetPosition(mPosition.ToDali());
+	SetPosition(position.x, position.y, position.z);
 }
 
 void
@@ -53,8 +56,7 @@ FrameActor::SetRotation(float x, float y, float z, float w)
 void
 FrameActor::SetRotation(wQuaternion rotation)
 {
-    mRotation = rotation;
-    mActor.SetOrientation(mRotation.ToDali());
+	SetRotation(rotation.x, rotation.y, rotation.z, rotation.w);
 }
 
 void
@@ -74,41 +76,43 @@ FrameActor::SetSize(wVector3 size)
 void
 FrameActor::RotateBy(wQuaternion rot)
 {
-    Dali::Quaternion newRot = mRotation.ToDali();
-    newRot *= rot.ToDali();
-    SetRotation(wQuaternion(newRot));
+	auto curRot = mRotation.ToDali();
+	auto paramRot = rot.ToDali();
+	auto newRot = paramRot * curRot;
+	SetRotation(wQuaternion(newRot));
+}
+
+void
+FrameActor::OnSpaceUpdated(FrameActor *plane, wVector3 basisX, wVector3 basisY, wVector3 basisZ, wVector3 origin)
+{
+    _plane = plane;
+    _spaceBasisX = basisX;
+    _spaceBasisY = basisY;
+    _spaceBasisZ = basisZ;
+    _spaceOrigin = origin;
 }
 
 void
 FrameActor::AddChild(FrameActor *child)
 {
-    bool found = (std::find(mChilds.begin(), mChilds.end(), child) != mChilds.end());
-    if (!found)
-    {
-        mChilds.push_back(child);
-        mActor.Add(child->GetActor());
-        child->mParent = this;
-    }
+	mActor.Add(child->GetActor());
+	child->_parent = this;
 }
 
 void
 FrameActor::RemoveChild(FrameActor *child)
 {
-    bool found = (std::find(mChilds.begin(), mChilds.end(), child) != mChilds.end());
-    if (found)
-    {
-        mChilds.remove(child);
-        mActor.Remove(child->GetActor());
-        child->mParent = nullptr;
-    }
+	mActor.Remove(child->GetActor());
+	if (_plane) _plane->AddChild(child);
+	else child->_parent = nullptr;
 }
 
 void
 FrameActor::Unparent()
 {
-    if (mParent)
+    if (_parent)
     {
-        mParent->RemoveChild(this);
+        _parent->RemoveChild(this);
     }
 }
 
