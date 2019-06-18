@@ -113,9 +113,9 @@ Scene::_UpdateCamera(wVector3 cameraPos, wQuaternion cameraRot)
 void
 Scene::_UpdateWorld(double deltaTime, wVector3 planeNormal)
 {
-	float gravity = planeNormal.y > 0 ? -9.81f : 9.81f;
-	mDynamicsWorld->setGravity(planeNormal.ToBullet() * gravity);
-	   mDynamicsWorld->stepSimulation(deltaTime);
+//	float gravity = planeNormal.y > 0 ? -9.81f : 9.81f;
+//	mDynamicsWorld->setGravity(planeNormal.ToBullet() * gravity);
+	mDynamicsWorld->stepSimulation(deltaTime);
 }
 
 void 
