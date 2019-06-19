@@ -15,6 +15,10 @@ class PlaneActor : public GraphicsActor
 {
 	public:
 		PlaneActor(Dali::Stage &stage, Model &model);
+	    wVector3 GetLocalPosition() override;
+	    wQuaternion GetLocalRotation() override;
+	    wVector3 GetPlanePosition() override;
+	    wQuaternion GetPlaneRotation() override;
 		void OnSpaceUpdated(FrameActor *plane, wVector3 basisX, wVector3 basisY, wVector3 basisZ, wVector3 origin) override;
 };
 
@@ -38,6 +42,9 @@ class Scene
         void AddActor(FrameActor *actor);
         void RemoveActor(FrameActor *actor);
         void AddUI(Dali::Actor &ui);    // todo : Wrap with FrameActor
+        wVector3 worldToPlanePos(wVector3 worldPos);
+        wVector3 planeToWorldPos(wVector3 planePos);
+        wVector3 worldToPlaneVec(wVector3 worldVec);
 
     private:
         void _UpdatePlane(wVector3 planeNormal, wVector3 planeOrigin);

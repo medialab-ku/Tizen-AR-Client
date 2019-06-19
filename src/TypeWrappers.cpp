@@ -76,6 +76,13 @@ wVector3::operator- () const
     return wVector3(-x, -y, -z);
 }
 
+std::ostream&
+operator<<(std::ostream& os, const wVector3& v)
+{
+	os << "[" << v.x << ", " << v.y << ", " << v.z << "]";
+	return os;
+}
+
 float
 wVector3::Length() const
 {
@@ -130,7 +137,33 @@ wQuaternion::ToBullet() const
 }
 
 wQuaternion
+wQuaternion::operator *(const wQuaternion& other) const
+{
+	Dali::Quaternion q1 = this->ToDali();
+	Dali::Quaternion q2 = other.ToDali();
+	return wQuaternion(q1 * q2);
+}
+
+wVector3
+wQuaternion::operator*(const wVector3& other) const
+{
+	Dali::Quaternion q = this->ToDali();
+	Dali::Vector3 v = other.ToDali();
+
+	return wVector3(q.Rotate(v));
+}
+
+std::ostream&
+operator<<(std::ostream& os, const wQuaternion& q)
+{
+	os << "[" << q.x << ", " << q.y << ", " << q.z << ", " << q.w << "]";
+	return os;
+}
+
+wQuaternion
 wQuaternion::Inverse()
 {
-    return wQuaternion(-x, -y, -z, -w);
+	float lengthSqare = x*x + y*y + z*z + w*w;
+
+    return wQuaternion(-(x / lengthSqare), -(y / lengthSqare), -(z / lengthSqare), w / lengthSqare);
 }

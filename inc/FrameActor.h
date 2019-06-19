@@ -17,14 +17,16 @@ public:
     virtual ~FrameActor();
     Dali::Actor& GetActor() { return mActor; }
     std::string GetName() const { return mActor.GetName(); }
-    wVector3 GetPosition() { return mPosition; }
-    wQuaternion GetRotation() { return mRotation; }
+    virtual wVector3 GetLocalPosition() { return mLocalPosition; }
+    virtual wQuaternion GetLocalRotation() { return mLocalRotation; }
+    virtual wVector3 GetPlanePosition() { return (_parent!=nullptr ? mLocalPosition + _parent->GetPlanePosition() : mLocalPosition); }
+    virtual wQuaternion GetPlaneRotation() { return (_parent!=nullptr ? _parent->GetPlaneRotation() * mLocalRotation : mLocalRotation); }
     wVector3 GetSize() { return mSize; }
     void SetName (const std::string name) { mActor.SetName(name); }
-    virtual void SetPosition(float x, float y, float z);
-    virtual void SetPosition(wVector3 position);
-    virtual void SetRotation(float x, float y, float z, float w);
-    virtual void SetRotation(wQuaternion rotation);
+    virtual void SetPosition(float x, float y, float z, bool setWorld=false);
+    virtual void SetPosition(wVector3 position, bool setWorld=false);
+    virtual void SetRotation(float x, float y, float z, float w, bool setWorld=false);
+    virtual void SetRotation(wQuaternion rotation, bool setWorld=false);
     virtual void SetSize(float x, float y, float z);
     virtual void SetSize(wVector3 size);
     virtual void RotateBy(wQuaternion rot);
@@ -52,8 +54,8 @@ protected:
 protected:
     Dali::Actor mActor;
     Dali::Stage mStage;
-    wVector3 mPosition;
-    wQuaternion mRotation;
+    wVector3 mLocalPosition;
+    wQuaternion mLocalRotation;
     wVector3 mSize;
     FrameActor *_parent;
     FrameActor *_plane;

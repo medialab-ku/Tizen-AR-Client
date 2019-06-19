@@ -36,35 +36,37 @@ PhysicsActor::~PhysicsActor()
 }
 
 void
-PhysicsActor::SetPosition(float x, float y, float z)
+PhysicsActor::SetPosition(float x, float y, float z, bool setWorld)
 {
-    FrameActor::SetPosition(x, y, z);
+    FrameActor::SetPosition(x, y, z, setWorld);
     auto transform = mRigidBody->getWorldTransform();
-    transform.setOrigin(btVector3(x, y, z));
+    wVector3 planePos = GetPlanePosition();
+    transform.setOrigin(planePos.ToBullet());
     mRigidBody->setWorldTransform(transform);
     mRigidBody->getMotionState()->setWorldTransform(transform);
 }
 
 void
-PhysicsActor::SetPosition(wVector3 pos)
+PhysicsActor::SetPosition(wVector3 pos, bool setWorld)
 {
-    SetPosition(pos.x, pos.y, pos.z);
+    SetPosition(pos.x, pos.y, pos.z, setWorld);
 }
 
 void
-PhysicsActor::SetRotation(float x, float y, float z, float w)
+PhysicsActor::SetRotation(float x, float y, float z, float w, bool setWorld)
 {
-    FrameActor::SetRotation(x, y, z, w);
+    FrameActor::SetRotation(x, y, z, w, setWorld);
     auto transform = mRigidBody->getWorldTransform();
-    transform.setRotation(btQuaternion(x, y, z, w));
+    wQuaternion planeRot = GetPlaneRotation();
+    transform.setRotation(planeRot.ToBullet());
     mRigidBody->setWorldTransform(transform);
     mRigidBody->getMotionState()->setWorldTransform(transform);
 }
 
 void
-PhysicsActor::SetRotation(wQuaternion rotation)
+PhysicsActor::SetRotation(wQuaternion rotation, bool setWorld)
 {
-    SetRotation(rotation.x, rotation.y, rotation.z, rotation.w);
+    SetRotation(rotation.x, rotation.y, rotation.z, rotation.w, setWorld);
 }
 
 void
@@ -85,7 +87,7 @@ void
 PhysicsActor::RotateBy(wQuaternion rot)
 {
     FrameActor::RotateBy(rot);
-    SetRotation(mRotation);
+    SetRotation(mLocalRotation);
 }
 
 void

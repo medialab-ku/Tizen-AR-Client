@@ -34,29 +34,35 @@ FrameActor::~FrameActor()
 }
 
 void
-FrameActor::SetPosition(float x, float y, float z)
+FrameActor::SetPosition(float x, float y, float z, bool setWorld)
 {
-    mPosition = wVector3(x, y, z);
-    mActor.SetPosition(mPosition.ToDali());
+	bool hasParent = (_parent != nullptr);
+    mLocalPosition = (setWorld && hasParent) ? (wVector3(x, y, z) - _parent->GetPlanePosition()) : (wVector3(x, y, z));
+    if(setWorld && hasParent) mActor.SetInheritPosition(false);
+    mActor.SetPosition(mLocalPosition.ToDali());
+    if(setWorld && hasParent) mActor.SetInheritPosition(true);
 }
 
 void
-FrameActor::SetPosition(wVector3 position)
+FrameActor::SetPosition(wVector3 position, bool setWorld)
 {
-	SetPosition(position.x, position.y, position.z);
+	SetPosition(position.x, position.y, position.z, setWorld);
 }
 
 void
-FrameActor::SetRotation(float x, float y, float z, float w)
+FrameActor::SetRotation(float x, float y, float z, float w, bool setWorld)
 {
-    mRotation = wQuaternion(x, y, z, w);
-    mActor.SetOrientation(mRotation.ToDali());
+	bool hasParent = (_parent != nullptr);
+    mLocalRotation = (setWorld && hasParent) ? (wQuaternion(x, y, z, w) * _parent->GetLocalRotation().Inverse()) : wQuaternion(x, y, z, w);
+    if(setWorld && hasParent) mActor.SetInheritPosition(false);
+    mActor.SetOrientation(mLocalRotation.ToDali());
+    if(setWorld && hasParent) mActor.SetInheritPosition(true);
 }
 
 void
-FrameActor::SetRotation(wQuaternion rotation)
+FrameActor::SetRotation(wQuaternion rotation, bool setWorld)
 {
-	SetRotation(rotation.x, rotation.y, rotation.z, rotation.w);
+	SetRotation(rotation.x, rotation.y, rotation.z, rotation.w, setWorld);
 }
 
 void
@@ -76,7 +82,7 @@ FrameActor::SetSize(wVector3 size)
 void
 FrameActor::RotateBy(wQuaternion rot)
 {
-	auto curRot = mRotation.ToDali();
+	auto curRot = mLocalRotation.ToDali();
 	auto paramRot = rot.ToDali();
 	auto newRot = paramRot * curRot;
 	SetRotation(wQuaternion(newRot));

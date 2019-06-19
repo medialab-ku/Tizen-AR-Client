@@ -11,6 +11,7 @@
 #include "obj-loader.h"
 #include "Model.h"
 #include <dlog.h>
+#include <sstream>
 
 using namespace std;
 
@@ -54,15 +55,21 @@ class DebugScene : public Scene
 			dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene init ui");
 			// Debug_CreateContents();
 //			CreateWater();
-//			CreateFloor();
+
 //			dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene create floor");
-//			CreateBlocks();
+
 //			dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene create blocks");
 //			CreateTorches();
 //			CreateParticle();
 //			CreateApple(wVector3(1,1,1));
 //			dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene create apple");
-			Test();
+//			Test();
+        }
+
+        void OnStart()
+        {
+        	CreateFloor();
+        	CreateBlocks();
         }
 
         void OnUpdate(double deltaTime) override
@@ -118,8 +125,8 @@ class DebugScene : public Scene
                 if (touch.GetState(0) == PointState::DOWN)
                 {
                     ScreenToWorldResult stw = mCamera->ScreenToWorld(touchPos);
-                    auto apple = CreateApple(stw.worldPos);
-                    apple->ApplyForce(stw.direction * 20.0);
+                    auto apple = CreateApple( worldToPlanePos(stw.worldPos) );
+                    apple->ApplyForce( worldToPlaneVec(stw.direction) * 20.0);
                 }
             }
         }
@@ -196,7 +203,7 @@ class DebugScene : public Scene
         {
             static float passedTime = 0.0f;
             mWaterShader.RegisterProperty("uTime", passedTime);
-            mWaterShader.RegisterProperty("uViewPos", mCamera->GetPosition().ToDali());
+            mWaterShader.RegisterProperty("uViewPos", mCamera->GetPlanePosition().ToDali());
             passedTime += deltaTime;
         }
 
@@ -214,13 +221,13 @@ class DebugScene : public Scene
             auto floorActor = new PhysicsActor(mStage, floorModel, mDynamicsWorld);
             floorActor->SetName("Floor");
             floorActor->SetPosition(0, 0.025, 0);
-            floorActor->SetSize(0.15, 0.05, 0.15);
+            floorActor->SetSize(0.3, 0.05, 0.3);
             AddActor(floorActor);
         }
 
         void UpdateFloor()
         {
-            mFloorShader.RegisterProperty("uViewPos", mCamera->GetPosition().ToDali());
+            mFloorShader.RegisterProperty("uViewPos", mCamera->GetPlanePosition().ToDali());
         }
 
         void CreateBlocks()
@@ -231,31 +238,31 @@ class DebugScene : public Scene
             mBlockShader.RegisterProperty("uLightColor", Dali::Vector3(1, 1, 1));
 
             PrimitiveTexturedCube cubeModel("wood.png", mBlockShader);
-            cubeModel.SetMass(0.1);
+            cubeModel.SetMass(0.5);
 
             auto cube1 = new PhysicsActor(mStage, cubeModel, mDynamicsWorld);
             cube1->SetName("Cube 1");
-            cube1->SetPosition(0.035, 0.12, 0.0);
-            cube1->SetSize(0.02, 0.05, 0.01);
+            cube1->SetPosition(0.035, 0.15, 0.0);
+            cube1->SetSize(0.02, 0.08, 0.02);
             // Pass FrameActor so that it can be controlled and receive events
             AddActor(cube1);
 
             auto cube2 = new PhysicsActor(mStage, cubeModel, mDynamicsWorld);
             cube2->SetName("Cube 2");
-            cube2->SetPosition(-0.035, 0.125, 0.0);
-            cube2->SetSize(0.02, 0.05, 0.01);
+            cube2->SetPosition(-0.035, 0.15, 0.0);
+            cube2->SetSize(0.02, 0.08, 0.02);
             AddActor(cube2);
 
             auto cube3 = new PhysicsActor(mStage, cubeModel, mDynamicsWorld);
             cube3->SetName("Cube 3");
-            cube3->SetPosition(0, 0.185, 0.01);
-            cube3->SetSize(0.02, 0.01, 0.05);
+            cube3->SetPosition(0.0, 0.25, 0.0);
+            cube3->SetSize(0.08, 0.02, 0.02);
             AddActor(cube3);
         }
 
         void UpdateBlocks()
         {
-            mBlockShader.RegisterProperty("uViewPos", mCamera->GetPosition().ToDali());
+            mBlockShader.RegisterProperty("uViewPos", mCamera->GetPlanePosition().ToDali());
         }
 
         void CreateParticle()
@@ -323,12 +330,12 @@ class DebugScene : public Scene
 
         void UpdateTorches()
         {
-            mTorchShader.RegisterProperty("uViewPos", mCamera->GetPosition().ToDali());
+            mTorchShader.RegisterProperty("uViewPos", mCamera->GetPlanePosition().ToDali());
         }
 
         void UpdateApple()
         {
-            mAppleShader.RegisterProperty("uViewPos", mCamera->GetPosition().ToDali());
+            mAppleShader.RegisterProperty("uViewPos", mCamera->GetPlanePosition().ToDali());
         }
 
         void Test()
@@ -340,6 +347,7 @@ class DebugScene : public Scene
 			PrimitiveCube model("wood.png", shader);
 			_parent = new GraphicsActor(mStage, model);
 			_parent->SetPosition(-0.1, 0.02, 0);
+			_parent->SetRotation( wQuaternion(0, 0.707107, 0, 0.707107) );
 			_parent->SetSize(0.02, 0.02, 0.02);
 			AddActor(_parent);
 
@@ -347,6 +355,51 @@ class DebugScene : public Scene
 			_child->SetPosition(0.1, 0.02, 0);
 			_child->SetSize(0.02, 0.02, 0.02);
 			AddActor(_child);
+
+			_parent->AddChild(_child);
+
+			stringstream ss;
+
+			ss << "parent's local position: " << _parent->GetLocalPosition();
+			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			ss.str("");
+			ss << "parent's local rotation: " << _parent->GetLocalRotation();
+			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			ss.str("");
+			ss << "parent's plane position: " << _parent->GetPlanePosition();
+			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			ss.str("");
+			ss << "parent's plane rotation: " << _parent->GetPlaneRotation();
+			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			ss.str("");
+
+			ss << "child's local position: " << _child->GetLocalPosition();
+			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			ss.str("");
+			ss << "child's local rotation: " << _child->GetLocalRotation();
+			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			ss.str("");
+			ss << "child's plane position: " << _child->GetPlanePosition();
+			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			ss.str("");
+			ss << "child's plane rotation: " << _child->GetPlaneRotation();
+			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			ss.str("");
+
+			_child->SetPosition(0.1, 0.02, 0, true);
+			_child->SetRotation(wQuaternion(0, 0.707107, 0, 0.707107), true);
+			ss << "child's local position: " << _child->GetLocalPosition();
+			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			ss.str("");
+			ss << "child's local rotation: " << _child->GetLocalRotation();
+			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			ss.str("");
+			ss << "child's plane position: " << _child->GetPlanePosition();
+			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			ss.str("");
+			ss << "child's plane rotation: " << _child->GetPlaneRotation();
+			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			ss.str("");
         }
 
     private:

@@ -8,6 +8,15 @@ PlaneActor::PlaneActor(Dali::Stage &stage, Model &model)
 	SetName("Plane");
 }
 
+wVector3
+PlaneActor::GetLocalPosition() { return wVector3(0, 0, 0); }
+wQuaternion
+PlaneActor::GetLocalRotation() { return wQuaternion(0, 0, 0, 1); }
+wVector3
+PlaneActor::GetPlanePosition() { return wVector3(0, 0, 0); }
+wQuaternion
+PlaneActor::GetPlaneRotation() { return wQuaternion(0, 0, 0, 1); }
+
 void
 PlaneActor::OnSpaceUpdated(FrameActor *plane, wVector3 basisX, wVector3 basisY, wVector3 basisZ, wVector3 origin)
 {
@@ -156,6 +165,35 @@ void
 Scene::AddUI(Dali::Actor &ui)
 {
     mUILayer.Add(ui);
+}
+
+wVector3
+Scene::worldToPlanePos(wVector3 worldPos)
+{
+	auto planePos = _origin;
+	auto planeRot = wQuaternion(Dali::Quaternion(_basisX.ToDali(), _basisY.ToDali(), _basisZ.ToDali()));
+
+	auto translated = worldPos - planePos;
+	auto rotated = planeRot.Inverse() * translated;
+	return rotated;
+}
+
+wVector3
+Scene::planeToWorldPos(wVector3 planePos)
+{
+	auto pP = _origin;
+	auto planeRot = wQuaternion(Dali::Quaternion(_basisX.ToDali(), _basisY.ToDali(), _basisZ.ToDali()));
+
+	auto rotated = planeRot * planePos;
+	auto translated = rotated + pP;
+	return translated;
+}
+wVector3
+Scene::worldToPlaneVec(wVector3 worldVec)
+{
+	auto planeRot = wQuaternion(Dali::Quaternion(_basisX.ToDali(), _basisY.ToDali(), _basisZ.ToDali()));
+
+	return planeRot.Inverse() * worldVec;
 }
 
 void

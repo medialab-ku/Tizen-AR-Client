@@ -109,19 +109,17 @@ private:
         if (_updateCount < 1)
         {
             // First frame that Dali Actors are not initialized yet
-            ++_updateCount;
+        	++_updateCount;
         }
         else if (_updateCount < 2)
         {
             // Second frame right after Dali Actors are initialized
-
-            ++_updateCount;
+            Net::BeginClient(9999); // blocked until connection
             mInitTime = std::chrono::high_resolution_clock::now();
             mOldTime = mInitTime;
             mCurrentTime = mInitTime;
-            Net::BeginClient(9999); // blocked until connection
-
             mScene->Start();
+            ++_updateCount;
         }
         else
         {
@@ -132,10 +130,10 @@ private:
 
             wVector3 normal, origin;
 
-            if(ReceiveCameraData())
-            {
-            	UpdateBackgroundMat(_rgb);
-            }
+//            if(ReceiveCameraData())
+//            {
+//            	UpdateBackgroundMat(_rgb);
+//            }
 
             if(ReceivePlaneData())
             {

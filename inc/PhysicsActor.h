@@ -10,10 +10,10 @@ public:
     PhysicsActor(Dali::Stage& stage, Model &model, btDynamicsWorld *dynamicsWorld);
     ~PhysicsActor() override;
     btRigidBody* GetRigidBody() const { return mRigidBody; }
-    void SetPosition(float x, float y, float z) override;
-    void SetPosition(wVector3 position) override;
-    void SetRotation(float x, float y, float z, float w) override;
-    void SetRotation(wQuaternion rotation) override;
+    void SetPosition(float x, float y, float z, bool setWorld=false) override;
+    void SetPosition(wVector3 position, bool setWorld=false) override;
+    void SetRotation(float x, float y, float z, float w, bool setWorld=false) override;
+    void SetRotation(wQuaternion rotation, bool setWorld=false) override;
     void SetSize(float x, float y, float z) override;
     void SetSize(wVector3 size) override;
     void RotateBy(wQuaternion rot) override;

@@ -4,6 +4,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <bullet/btBulletDynamicsCommon.h>
 #include <Eigen/Core>
+#include <iostream>
 
 /*
  * Integrates each data structures into one class.
@@ -27,6 +28,7 @@ public:
     wVector3 operator-(const wVector3&) const;
     wVector3 operator*(const float) const;
     wVector3 operator-() const;
+    friend std::ostream& operator<<(std::ostream& os, const wVector3& v);
     float Length() const;
     wVector3 Normalize();
 
@@ -48,6 +50,10 @@ public:
     Dali::Quaternion ToCV() const;
     Dali::Quaternion ToDali() const;
     btQuaternion ToBullet() const;
+
+    wQuaternion operator*(const wQuaternion&) const;
+    wVector3 operator*(const wVector3&) const;
+    friend std::ostream& operator<<(std::ostream& os, const wQuaternion& q);
 
     // Operations not implemented yet
     wQuaternion Inverse();
