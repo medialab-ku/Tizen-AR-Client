@@ -66,7 +66,7 @@ class DebugScene : public Scene
 //			Test();
         }
 
-        void OnStart()
+        void OnStart() override
         {
         	CreateFloor();
         	CreateBlocks();
@@ -126,7 +126,7 @@ class DebugScene : public Scene
                 {
                     ScreenToWorldResult stw = mCamera->ScreenToWorld(touchPos);
                     auto apple = CreateApple( worldToPlanePos(stw.worldPos) );
-                    apple->ApplyForce( worldToPlaneVec(stw.direction) * 20.0);
+                    apple->ApplyForce( worldToPlaneVec(stw.direction) * 33.0);
                 }
             }
         }

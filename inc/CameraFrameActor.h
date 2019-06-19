@@ -37,7 +37,14 @@ class CameraFrameActor : public FrameActor
         ScreenToWorldResult ScreenToWorld(Dali::Vector2 screen);
 
     private:
+        Dali::Matrix GetProjMatrix();
+        Dali::Matrix GetViewMatrix();
         Dali::CameraActor mCameraActor;
+
+        float fov;
+        float aspect;
+        float near;
+        float far;
 };
 
 #endif

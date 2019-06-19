@@ -11,10 +11,42 @@
 #include "obj-loader.h"
 #include "Model.h"
 #include <dlog.h>
+#include <sstream>
 
 using namespace std;
 
-class SceneOne {
+class SceneOne : public Scene
+{
+public:
+	SceneOne(Dali::Stage &stage, Dali::CameraActor &camera, Dali::Layer &uiLayer,
+            btDiscreteDynamicsWorld *dynamicsWorld)
+            : Scene(stage, camera, uiLayer, dynamicsWorld)
+	{
+
+
+	}
+
+	void OnStart() override
+	{
+
+	}
+
+	void OnUpdate() override
+	{
+
+	}
+
+	void OnKeyEvent(const Dali::KeyEvent &event) override
+	{
+
+	}
+
+	void OnTouch(Dali::Actor actor, const Dali::TouchData &touch) override
+	{
+
+	}
+
+private:
 
 };
 

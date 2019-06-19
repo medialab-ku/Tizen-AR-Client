@@ -38,12 +38,12 @@ Scene::Scene(Dali::Stage &stage, Dali::CameraActor &camera, Dali::Layer &uiLayer
     mCamera = new CameraFrameActor(stage, camera);
 
     Dali::Shader planeShader;
-    dlog_print(DLOG_DEBUG, "TIZENAR", "getshader");
+    //dlog_print(DLOG_DEBUG, "TIZENAR", "getshader");
     if (not Assets::GetShader("vertexColor.glsl", "fragmentColor.glsl", planeShader))
     {
     	dlog_print(DLOG_DEBUG, "TIZENAR", "error");
     }
-    dlog_print(DLOG_DEBUG, "TIZENAR", "asdf");
+    //dlog_print(DLOG_DEBUG, "TIZENAR", "asdf");
 	planeShader.RegisterProperty("uAlpha", 0.3f);
 	PrimitivePlane model("wood.png", planeShader);
 	mPlane = new PlaneActor(stage, model);
@@ -65,17 +65,17 @@ Scene::Start()
 void
 Scene::Update(double deltaTime, wVector3 planeNormal, wVector3 planeOrigin, wVector3 cameraPos, wQuaternion cameraRot)
 {
-	dlog_print(DLOG_DEBUG, "TIZENAR", "plane");
+	// dlog_print(DLOG_DEBUG, "TIZENAR", "plane");
 	_UpdatePlane(planeNormal, planeOrigin);
-	dlog_print(DLOG_DEBUG, "TIZENAR", "camera");
+	// dlog_print(DLOG_DEBUG, "TIZENAR", "camera");
 	_UpdateCamera(cameraPos, cameraRot);
-	dlog_print(DLOG_DEBUG, "TIZENAR", "world");
+	// dlog_print(DLOG_DEBUG, "TIZENAR", "world");
 	_UpdateWorld(deltaTime, planeNormal);
-	dlog_print(DLOG_DEBUG, "TIZENAR", "onupdate");
+	// dlog_print(DLOG_DEBUG, "TIZENAR", "onupdate");
     OnUpdate(deltaTime);
     for(auto itr = mListActor.begin(); itr != mListActor.end(); ++itr)
     {
-    	dlog_print(DLOG_DEBUG, "TIZENAR", (*itr)->GetName().c_str());
+    	// dlog_print(DLOG_DEBUG, "TIZENAR", (*itr)->GetName().c_str());
         (*itr)->OnUpdate(deltaTime);
     }
 }

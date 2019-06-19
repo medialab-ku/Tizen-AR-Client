@@ -23,7 +23,9 @@
 #include <dlog.h>
 #include <sstream>
 
-const unsigned int UPDATE_INTERVAL = 50;
+const unsigned int UPDATE_INTERVAL = 33;
+const int IMAGE_WIDTH = 320;
+const int IMAGE_HEIGHT = 240;
 const float Focal_X = 517.306408f;  // TUM
 const float Focal_Y = 516.469215f;  // TUM
 const int SCREEN_WIDTH = 640;
@@ -55,7 +57,6 @@ private:
     void Create(Dali::Application &application)
     {
     	dlog_print(DLOG_DEBUG, "TIZENAR", "create start");
-    	// application.GetWindow().SetPreferredOrientation(Dali::Window::WindowOrientation::LANDSCAPE);
 
         Dali::Window winHandle = application.GetWindow();
         winHandle.ShowIndicator( Dali::Window::INVISIBLE );
@@ -130,18 +131,18 @@ private:
 
             wVector3 normal, origin;
 
-//            if(ReceiveCameraData())
-//            {
-//            	UpdateBackgroundMat(_rgb);
-//            }
+            if(ReceiveCameraData())
+            {
+            	UpdateBackgroundMat(_rgb);
+            }
 
             if(ReceivePlaneData())
             {
             	if(mUpdatePlane)
 				{
 					cout << "calc plane" << endl;
-					dlog_print(DLOG_DEBUG, "TIZENAR", "plane update Eq: %f, %f, %f, %f", _planeEq(0), _planeEq(1), _planeEq(2), _planeEq(3));
-					dlog_print(DLOG_DEBUG, "TIZENAR", "plane update Pos: %f, %f, %f", _planePos(0), _planePos(1), _planePos(2));
+					// dlog_print(DLOG_DEBUG, "TIZENAR", "plane update Eq: %f, %f, %f, %f", _planeEq(0), _planeEq(1), _planeEq(2), _planeEq(3));
+					// dlog_print(DLOG_DEBUG, "TIZENAR", "plane update Pos: %f, %f, %f", _planePos(0), _planePos(1), _planePos(2));
 					normal = wVector3( Eigen::Vector3f(_planeEq(0), _planeEq(1), _planeEq(2)) );
 					normal.Normalize();
 					if (normal.y > 0) normal = -normal;
@@ -173,7 +174,7 @@ private:
 		Net::DecodeCameraData(buf, output_left, output_pos, output_rot);
 
 		// 1. create cv::Mat from received data first
-		_rgb = cv::Mat(SCREEN_HEIGHT, SCREEN_WIDTH, CV_8UC3, output_left.data);
+		_rgb = cv::Mat(IMAGE_HEIGHT, IMAGE_WIDTH, CV_8UC3, output_left.data);
 		// 2. output_left.data will be freed out of this scope
 		// 3. cv::Mat::clone() lets cv::Mat own its buffer so that _rgb will maintain its value
 		_rgb = _rgb.clone();
