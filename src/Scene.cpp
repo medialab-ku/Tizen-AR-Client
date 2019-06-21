@@ -127,7 +127,7 @@ Scene::_UpdateWorld(double deltaTime, wVector3 planeNormal)
 //	float gravity = planeNormal.y > 0 ? -9.81f : 9.81f;
 //	mDynamicsWorld->setGravity(planeNormal.ToBullet() * gravity);
 	if(deltaTime < 1.0f)
-		mDynamicsWorld->stepSimulation(deltaTime, 2);
+		mDynamicsWorld->stepSimulation(deltaTime, 3);
 }
 
 void 

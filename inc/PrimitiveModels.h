@@ -312,7 +312,6 @@ public:
     	dlog_print(DLOG_DEBUG, "TIZENAR", "collision shape of %s : %f, %f, %f", _objName.c_str(), size.x, size.y, size.z );
     	dlog_print(DLOG_DEBUG, "TIZENAR", "collision center of %s : %f, %f, %f", _objName.c_str(), center.x, center.y, center.z );
     	btCollisionShape *shape = new btBoxShape(btVector3(size.x/2.0f, size.y/2.0f, size.z/2.0f));
-    	SetCenter(center);
 		return shape;
     }
 private:

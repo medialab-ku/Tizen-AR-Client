@@ -21,7 +21,7 @@ PhysicsActor::PhysicsActor(Dali::Stage &stage, Model &model, btDynamicsWorld *dy
     rbInfo.m_restitution = model.GetRestitution();
 
     mRigidBody = new btRigidBody(rbInfo);
-    mRigidBody->setActivationState(DISABLE_DEACTIVATION);
+    mRigidBody->setActivationState(ACTIVE_TAG);
     mDynamicsWorld->addRigidBody(mRigidBody);
 }
 

@@ -28,8 +28,8 @@ class AppleModel : public Model
                 return;
             }
 
-            SetMass(0.1);
-            SetRollingFriction(0.05f);
+            SetMass(0.3f);
+            SetRollingFriction(0.05);
             
             Geometry geometry = obj.CreateGeometry(7, true);
 		    SetGeometry(geometry);
@@ -37,9 +37,19 @@ class AppleModel : public Model
 
         btCollisionShape* CreateCollisionShape() override
         {
-            btCollisionShape *shape = new btSphereShape(btScalar(0.4));
+        	ObjLoader obj;
+			if (!Assets::GetObj("Apple.obj", obj))
+			{
+				return new btSphereShape(btScalar(0.4));
+			}
+
+			Dali::Vector3 size = obj.GetSize();
+			dlog_print(DLOG_DEBUG, "TIZENAR", "collision shape of apple : %f, %f, %f", size.x, size.y, size.z );
+
+            btCollisionShape *shape = new btSphereShape(btScalar((size.x+size.y+size.z) / 6.0f));
             return shape;
         }
+
 };
 
 class DebugScene : public Scene
