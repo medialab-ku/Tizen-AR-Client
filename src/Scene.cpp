@@ -1,9 +1,11 @@
 #include "Scene.h"
+#include "FileSystem.h"
 #include <iostream>
 #include <dlog.h>
+#include <sstream>
 
 PlaneActor::PlaneActor(Dali::Stage &stage, Model &model)
-	: GraphicsActor(stage, model)
+	: FrameActor(stage)
 {
 	SetName("Plane");
 }
@@ -20,7 +22,7 @@ PlaneActor::GetPlaneRotation() { return wQuaternion(0, 0, 0, 1); }
 void
 PlaneActor::OnSpaceUpdated(FrameActor *plane, wVector3 basisX, wVector3 basisY, wVector3 basisZ, wVector3 origin)
 {
-	GraphicsActor::OnSpaceUpdated(plane, basisX, basisY, basisZ, origin);
+	FrameActor::OnSpaceUpdated(plane, basisX, basisY, basisZ, origin);
 	auto pos = origin;
 	auto rot = wQuaternion(Dali::Quaternion(basisX.ToDali(), basisY.ToDali(), basisZ.ToDali()));
 	SetPosition(pos);
@@ -124,7 +126,8 @@ Scene::_UpdateWorld(double deltaTime, wVector3 planeNormal)
 {
 //	float gravity = planeNormal.y > 0 ? -9.81f : 9.81f;
 //	mDynamicsWorld->setGravity(planeNormal.ToBullet() * gravity);
-	mDynamicsWorld->stepSimulation(deltaTime);
+	if(deltaTime < 1.0f)
+		mDynamicsWorld->stepSimulation(deltaTime, 2);
 }
 
 void 
@@ -157,6 +160,7 @@ Scene::RemoveActor(FrameActor *actor)
             mPlane->RemoveChild(actor);
         }
 
+        actor->RemoveActor();
         delete actor;
     }
 }
@@ -165,6 +169,18 @@ void
 Scene::AddUI(Dali::Actor &ui)
 {
     mUILayer.Add(ui);
+}
+
+void
+Scene::ReadRecipe(std::string filename, std::string& outData)
+{
+	std::string filepath = FileSystem::GetResourcePath(filename);
+
+	std::ifstream file(filepath);
+	std::stringstream buf;
+	buf << file.rdbuf();
+
+	outData = std::string(buf.str());
 }
 
 wVector3

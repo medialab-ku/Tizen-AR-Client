@@ -11,7 +11,7 @@
 #include "PrimitiveModels.h"
 #include "Assets.h"
 
-class PlaneActor : public GraphicsActor
+class PlaneActor : public FrameActor
 {
 	public:
 		PlaneActor(Dali::Stage &stage, Model &model);
@@ -42,6 +42,7 @@ class Scene
         void AddActor(FrameActor *actor);
         void RemoveActor(FrameActor *actor);
         void AddUI(Dali::Actor &ui);    // todo : Wrap with FrameActor
+        void ReadRecipe(std::string filename, std::string& outData);
         wVector3 worldToPlanePos(wVector3 worldPos);
         wVector3 planeToWorldPos(wVector3 planePos);
         wVector3 worldToPlaneVec(wVector3 worldVec);

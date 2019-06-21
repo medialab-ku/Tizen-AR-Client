@@ -5,8 +5,8 @@ Model::Model(Dali::Shader &shader)
       mTextures(),
       // See btRigidbody.h if you want to check default values
       mMass(0),
-      mFriction(0.5),
-      mRollingFriction(0),
+      mFriction(0.35),
+      mRollingFriction(0.005),
       mSpinningFriction(0),
       mRestitution(0)
 {

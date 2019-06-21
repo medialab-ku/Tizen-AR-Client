@@ -16,18 +16,20 @@
 #include "Background.h"
 #include "Scene.h"
 #include "DebugScene.h"
+#include "Scene_one.h"
 #include "RealSense.h"
 #include "FileSystem.h"
 #include "Net.h"
 
 #include <dlog.h>
 #include <sstream>
+#define USE_PERSISTENT_CONTACTS 1
 
 const unsigned int UPDATE_INTERVAL = 33;
 const int IMAGE_WIDTH = 320;
 const int IMAGE_HEIGHT = 240;
-const float Focal_X = 517.306408f;  // TUM
-const float Focal_Y = 516.469215f;  // TUM
+const float Focal_X = 609.275f;  // realsense
+const float Focal_Y = 609.119f;  // realsense
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const float CAMERA_NEAR = 0.001f;
@@ -98,7 +100,8 @@ private:
 		mTimer.Start();
 		dlog_print(DLOG_DEBUG, "TIZENAR", "timer start");
 
-        mScene = new DebugScene(mStage, mCamera, mUILayer, mDynamicsWorld);
+        //mScene = new DebugScene(mStage, mCamera, mUILayer, mDynamicsWorld);
+		mScene = new SceneOne(mStage, mCamera, mUILayer, mDynamicsWorld);
         dlog_print(DLOG_DEBUG, "TIZENAR", "create done");
     }
 

@@ -21,6 +21,7 @@ PhysicsActor::PhysicsActor(Dali::Stage &stage, Model &model, btDynamicsWorld *dy
     rbInfo.m_restitution = model.GetRestitution();
 
     mRigidBody = new btRigidBody(rbInfo);
+    mRigidBody->setActivationState(DISABLE_DEACTIVATION);
     mDynamicsWorld->addRigidBody(mRigidBody);
 }
 
@@ -106,7 +107,13 @@ PhysicsActor::OnUpdate(double deltaTime)
 }
 
 void
-PhysicsActor::ApplyForce(wVector3 force)
+PhysicsActor::ApplyForce(wVector3 force, wVector3 pos)
 {
-    mRigidBody->applyCentralForce(force.ToBullet());
+    mRigidBody->applyForce(force.ToBullet(), pos.ToBullet());
+}
+
+void
+PhysicsActor::ApplyTorque(wVector3 torque)
+{
+	mRigidBody->applyTorque(torque.ToBullet());
 }

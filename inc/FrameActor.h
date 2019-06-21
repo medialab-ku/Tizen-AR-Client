@@ -48,6 +48,8 @@ public:
      */
     virtual void OnUpdate(double deltaTime);
 
+    void RemoveActor();
+
 protected:
     FrameActor(Dali::Stage &stage, Dali::Actor &actor);
     

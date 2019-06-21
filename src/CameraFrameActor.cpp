@@ -35,15 +35,15 @@ CameraFrameActor::GetProjMatrix()
 	};
 	Dali::Matrix projMat(arr);
 
-//	Dali::Matrix projDaliMat;
-//	projMat = mCameraActor.GetCurrentProperty<Dali::Matrix>(Dali::CameraActor::Property::PROJECTION_MATRIX);
-//    std::stringstream ss;
-//	ss << "dali proj : "  << projDaliMat;
-//	dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
-//	ss.str("");
-//	ss << "eigen proj : " << projMat;
-//	dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
-//	ss.str("");
+	Dali::Matrix projDaliMat;
+	projMat = mCameraActor.GetCurrentProperty<Dali::Matrix>(Dali::CameraActor::Property::PROJECTION_MATRIX);
+    std::stringstream ss;
+	ss << "dali proj : "  << projDaliMat;
+	dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+	ss.str("");
+	ss << "eigen proj : " << projMat;
+	dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+	ss.str("");
 
 	return projMat;
 }
@@ -66,16 +66,16 @@ CameraFrameActor::GetViewMatrix()
 	};
 	Dali::Matrix viewMat(arr);
 
-//    std::stringstream ss;
-//    Dali::Matrix viewDali;
-//    viewDali = mCameraActor.GetCurrentProperty<Dali::Matrix>(Dali::CameraActor::Property::VIEW_MATRIX);
-//
-//    ss << "dali view : "  << viewDali;
-//    dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
-//    ss.str("");
-//    ss << "eigen view : " << viewMat;
-//    dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
-//    ss.str("");
+    std::stringstream ss;
+    Dali::Matrix viewDali;
+    viewDali = mCameraActor.GetCurrentProperty<Dali::Matrix>(Dali::CameraActor::Property::VIEW_MATRIX);
+
+    ss << "dali view : "  << viewDali;
+    dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+    ss.str("");
+    ss << "eigen view : " << viewMat;
+    dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+    ss.str("");
     return viewMat;
 }
 
@@ -179,13 +179,13 @@ ScreenToWorldResult
 CameraFrameActor::ScreenToWorld(Dali::Vector2 screen)
 {
 	std::stringstream ss;
-	//dlog_print(DLOG_DEBUG, "TIZENAR", "start debug");
+	dlog_print(DLOG_DEBUG, "TIZENAR", "start debug");
 	// screen to clip
 	Dali::Vector2 screenSize = mStage.GetSize();
 	// need to get screen points in landscape mode
 	float y = (2.0 * screen.x / screenSize.x - 1);
 	float x = (2.0 * screen.y / screenSize.y - 1);
-	//dlog_print(DLOG_DEBUG, "TIZENAR", "screen point : %f, %f", x, y);
+	dlog_print(DLOG_DEBUG, "TIZENAR", "screen point : %f, %f", x, y);
 
 	Dali::Vector4 clip_Start(x, y, -1, 1);
 	Dali::Vector4 clip_End(x, y, 1, 1);
@@ -200,9 +200,9 @@ CameraFrameActor::ScreenToWorld(Dali::Vector2 screen)
 	Dali::Vector4 camera_End = projMatInv * clip_End;
 	camera_Start /= camera_Start.w;
 	camera_End /= camera_End.w;
-//	ss << "touch camera pos : " << camera_Start;
-//	dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
-//	ss.str("");
+	ss << "touch camera pos : " << camera_Start;
+	dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+	ss.str("");
 
 	// camera to world
 	Dali::Matrix viewMat;
@@ -213,16 +213,16 @@ CameraFrameActor::ScreenToWorld(Dali::Vector2 screen)
 	Dali::Vector4 world_Start = viewMatInv * camera_Start;
 	Dali::Vector4 world_End = viewMatInv * camera_End;
 	Dali::Vector4 dir = world_End - world_Start;
-//	ss << "touch world pos : " << world_Start << ", dir : " << dir;
-//	dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
-//	ss.str("");
+	ss << "touch world pos : " << world_Start << ", dir : " << dir;
+	dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+	ss.str("");
 
 	ScreenToWorldResult result;
 	result.worldPos = wVector3(Dali::Vector3(world_Start.x, world_Start.y, world_Start.z));
 	result.direction = wVector3(Dali::Vector3(dir.x, dir.y, dir.z)).Normalize();
 
-//	ss << "touch final pos : " << result.worldPos << ", camera pos : " << GetLocalPosition();
-//	dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
-//	ss.str("");
+	ss << "touch final pos : " << result.worldPos << ", camera pos : " << GetLocalPosition();
+	dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+	ss.str("");
 	return result;
 }

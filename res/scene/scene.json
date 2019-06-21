@@ -1,0 +1,362 @@
+{
+    "globalScale": 0.02,
+    "objs": [
+        {
+            "model": "terrain-plane-plain",
+            "material": "color",
+            "texture": "",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "scale": {
+                "x": 40.0,
+                "y": 40.0,
+                "z": 40.0
+            }
+        },
+        {
+            "model": "block_wood1_LOD0",
+            "material": "texture",
+            "texture": "cube_tex",
+            "position": {
+                "x": 0.75,
+                "y": 1.5,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        {
+            "model": "block_wood1_LOD0",
+            "material": "texture",
+            "texture": "cube_tex",
+            "position": {
+                "x": 2.25,
+                "y": 1.5,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        {
+            "model": "block_wood1_LOD0",
+            "material": "texture",
+            "texture": "cube_tex",
+            "position": {
+                "x": -0.75,
+                "y": 1.5,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        {
+            "model": "block_wood1_LOD0",
+            "material": "texture",
+            "texture": "cube_tex",
+            "position": {
+                "x": -2.25,
+                "y": 1.5,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        {
+            "model": "block_wood1_LOD0",
+            "material": "texture",
+            "texture": "cube_tex",
+            "position": {
+                "x": 0.75,
+                "y": 3.5,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        {
+            "model": "block_wood1_LOD0",
+            "material": "texture",
+            "texture": "cube_tex",
+            "position": {
+                "x": -0.75,
+                "y": 3.5,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        {
+            "model": "block_wood2_LOD0",
+            "material": "texture",
+            "texture": "cube_tex",
+            "position": {
+                "x": 0.0,
+                "y": 0.5,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        {
+            "model": "block_wood2_LOD0",
+            "material": "texture",
+            "texture": "cube_tex",
+            "position": {
+                "x": 1.5,
+                "y": 0.5,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        {
+            "model": "block_wood2_LOD0",
+            "material": "texture",
+            "texture": "cube_tex",
+            "position": {
+                "x": 3.0,
+                "y": 0.5,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        {
+            "model": "block_wood2_LOD0",
+            "material": "texture",
+            "texture": "cube_tex",
+            "position": {
+                "x": -1.5,
+                "y": 0.5,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        {
+            "model": "block_wood2_LOD0",
+            "material": "texture",
+            "texture": "cube_tex",
+            "position": {
+                "x": -3.0,
+                "y": 0.5,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        {
+            "model": "block_wood2_LOD0",
+            "material": "texture",
+            "texture": "cube_tex",
+            "position": {
+                "x": 0.0,
+                "y": 2.5,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        {
+            "model": "block_wood2_LOD0",
+            "material": "texture",
+            "texture": "cube_tex",
+            "position": {
+                "x": 1.5,
+                "y": 2.5,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        {
+            "model": "block_wood2_LOD0",
+            "material": "texture",
+            "texture": "cube_tex",
+            "position": {
+                "x": -1.5,
+                "y": 2.5,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        {
+            "model": "block_wood2_LOD0",
+            "material": "texture",
+            "texture": "cube_tex",
+            "position": {
+                "x": 0.0,
+                "y": 4.5,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        {
+            "model": "combined",
+            "material": "texture",
+            "texture": "color-atlas",
+            "position": {
+                "x": 0.0,
+                "y": 5.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "scale": {
+                "x": 16.0,
+                "y": 16.0,
+                "z": 16.0
+            }
+        }
+    ]
+}

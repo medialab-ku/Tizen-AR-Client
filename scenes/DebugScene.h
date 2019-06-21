@@ -25,11 +25,11 @@ class AppleModel : public Model
             ObjLoader obj;
             if (!Assets::GetObj("Apple.obj", obj))
             {
-                std::cout << "fuck! cant read obj" << std::endl;
                 return;
             }
 
             SetMass(0.1);
+            SetRollingFriction(0.05f);
             
             Geometry geometry = obj.CreateGeometry(7, true);
 		    SetGeometry(geometry);
@@ -126,7 +126,7 @@ class DebugScene : public Scene
                 {
                     ScreenToWorldResult stw = mCamera->ScreenToWorld(touchPos);
                     auto apple = CreateApple( worldToPlanePos(stw.worldPos) );
-                    apple->ApplyForce( worldToPlaneVec(stw.direction) * 33.0);
+                    apple->ApplyForce( worldToPlaneVec(stw.direction) * 10.0, wVector3(0, 0.015, 0));
                 }
             }
         }
@@ -215,7 +215,7 @@ class DebugScene : public Scene
             Dali::Vector3 floorColor =  Dali::Vector3(239.0, 199.0, 166.0) / 255.0f;
             mFloorShader.RegisterProperty("uObjectColor", floorColor);
             
-            PrimitiveCube floorModel( "wood.png", mFloorShader ); // not using texture. only for consturctor
+            PrimitiveCube floorModel(mFloorShader ); // not using texture. only for consturctor
             floorModel.SetMass(0);
 
             auto floorActor = new PhysicsActor(mStage, floorModel, mDynamicsWorld);
@@ -290,13 +290,13 @@ class DebugScene : public Scene
             mTorchShader.RegisterProperty("uLightPos", mLightDir.ToDali());
             mTorchShader.RegisterProperty("uViewPos", Dali::Vector3(0, 0, 0));
             mTorchShader.RegisterProperty("uLightColor", Dali::Vector3(1, 1, 1));
-            ObjLoader obj;
-            if (!Assets::GetObj("Campfire.obj", obj))
-            {
-                std::cout << "fuck! cant read obj" << std::endl;
-                return;
-            }
-            PrimitiveObj objModel("Default_Palette.png", mTorchShader, obj);
+//            ObjLoader obj;
+//            if (!Assets::GetObj("Campfire.obj", obj))
+//            {
+//                std::cout << "fuck! cant read obj" << std::endl;
+//                return;
+//            }
+            PrimitiveObj objModel("Default_Palette.png", mTorchShader, "Campfire.obj");
 
             auto campfire = new GraphicsActor(mStage, objModel);
             //campfire->GetActor().GetRendererAt(0).SetProperty(Dali::Renderer::Property::FACE_CULLING_MODE, Dali::FaceCullingMode::FRONT);
@@ -344,7 +344,7 @@ class DebugScene : public Scene
 			if (not Assets::GetShader("vertexColor.glsl", "fragmentColor.glsl", shader))
 				std::cout << "Failed to load shader." << std::endl;
 			shader.RegisterProperty("uAlpha", 1.0f);
-			PrimitiveCube model("wood.png", shader);
+			PrimitiveCube model(shader);
 			_parent = new GraphicsActor(mStage, model);
 			_parent->SetPosition(-0.1, 0.02, 0);
 			_parent->SetRotation( wQuaternion(0, 0.707107, 0, 0.707107) );

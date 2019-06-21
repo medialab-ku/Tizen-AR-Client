@@ -18,7 +18,8 @@ public:
     void SetSize(wVector3 size) override;
     void RotateBy(wQuaternion rot) override;
     void OnUpdate(double deltaTime) override;
-    void ApplyForce(wVector3 force);
+    void ApplyForce(wVector3 force, wVector3 pos);
+    void ApplyTorque(wVector3 torque);
 
 private:
     btRigidBody *mRigidBody;

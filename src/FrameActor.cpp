@@ -131,3 +131,12 @@ void
 FrameActor::OnUpdate(double deltaTime)
 {
 }
+
+void
+FrameActor::RemoveActor()
+{
+	mActor.Unparent();
+	int rc = mActor.GetRendererCount();
+	for(int i = 0; i < rc; i++)
+		mActor.RemoveRenderer(rc);
+}

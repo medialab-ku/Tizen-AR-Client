@@ -4,6 +4,8 @@
 #include "Model.h"
 #include "obj-loader.h"
 #include <fstream>
+#include "Assets.h"
+#include <dlog.h>
 using namespace Dali;
 
 namespace {
@@ -196,10 +198,10 @@ struct Vertex
 class PrimitiveCube : public Model
 {
 public:
-	PrimitiveCube(std::string textureName, Dali::Shader &shader)
+	PrimitiveCube(Dali::Shader &shader)
 		: Model(shader)
 	{
-		AddTexture(0, textureName);
+		AddTexture(0, "default.jpg");
 		PropertyBuffer vertexBuffer = PropertyBuffer::New( Property::Map()
     	                                                       .Add( "aPosition", Property::VECTOR3 )
     	                                                       .Add( "aColor", Property::VECTOR3 ) );
@@ -282,14 +284,39 @@ public:
 class PrimitiveObj : public Model
 {
 public:
-    PrimitiveObj(std::string textureName, Dali::Shader &shader, ObjLoader& obj)
+    PrimitiveObj(std::string textureName, Dali::Shader &shader, std::string objName)
 		: Model(shader)
     {
+    	_objName = std::string(objName);
+    	ObjLoader obj;
+		if (!Assets::GetObj(objName, obj))
+		{
+			return;
+		}
         AddTexture(0, textureName);
         Geometry geometry = obj.CreateGeometry(7, true);
 
 		SetGeometry(geometry);
     }
+
+    btCollisionShape* CreateCollisionShape() override
+    {
+    	ObjLoader obj;
+    	if (!Assets::GetObj(_objName, obj))
+		{
+			return new btBoxShape(btVector3(1, 1, 1));
+		}
+
+    	Dali::Vector3 size = obj.GetSize();
+    	Dali::Vector3 center = obj.GetCenter();
+    	dlog_print(DLOG_DEBUG, "TIZENAR", "collision shape of %s : %f, %f, %f", _objName.c_str(), size.x, size.y, size.z );
+    	dlog_print(DLOG_DEBUG, "TIZENAR", "collision center of %s : %f, %f, %f", _objName.c_str(), center.x, center.y, center.z );
+    	btCollisionShape *shape = new btBoxShape(btVector3(size.x/2.0f, size.y/2.0f, size.z/2.0f));
+    	SetCenter(center);
+		return shape;
+    }
+private:
+    std::string _objName;
 };
 }
 #endif
