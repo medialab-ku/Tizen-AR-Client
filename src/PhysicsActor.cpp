@@ -1,14 +1,20 @@
 #include "PhysicsActor.h"
+#include <sstream>
+#include <dlog.h>
 
-PhysicsActor::PhysicsActor(Dali::Stage &stage, Model &model, btDynamicsWorld *dynamicsWorld)
+PhysicsActor::PhysicsActor(Dali::Stage &stage, Model &model, btDynamicsWorld *dynamicsWorld, wVector3 size)
     : GraphicsActor(stage, model),
       mDynamicsWorld(dynamicsWorld)
 {
     // Collision shape data is provided by Model
-    auto shape = model.CreateCollisionShape();
+    auto shape = model.CreateCollisionShape(size);
+    FrameActor::SetSize(size);
     float mass = model.GetMass();
     btVector3 localInertia(0, 0, 0);
     shape->calculateLocalInertia(mass, localInertia);
+    std::stringstream ss;
+    ss << "mass : " << mass << ", inertia : " << localInertia.x() << ", " << localInertia.y() << ", " << localInertia.z();
+    dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str() );
 
     btTransform transform;
     transform.setIdentity();
@@ -21,7 +27,7 @@ PhysicsActor::PhysicsActor(Dali::Stage &stage, Model &model, btDynamicsWorld *dy
     rbInfo.m_restitution = model.GetRestitution();
 
     mRigidBody = new btRigidBody(rbInfo);
-    mRigidBody->setActivationState(ACTIVE_TAG);
+    mRigidBody->setActivationState(DISABLE_DEACTIVATION);
     mDynamicsWorld->addRigidBody(mRigidBody);
 }
 
@@ -44,7 +50,6 @@ PhysicsActor::SetPosition(float x, float y, float z, bool setWorld)
     wVector3 planePos = GetPlanePosition();
     transform.setOrigin(planePos.ToBullet());
     mRigidBody->setWorldTransform(transform);
-    mRigidBody->getMotionState()->setWorldTransform(transform);
 }
 
 void
@@ -61,27 +66,12 @@ PhysicsActor::SetRotation(float x, float y, float z, float w, bool setWorld)
     wQuaternion planeRot = GetPlaneRotation();
     transform.setRotation(planeRot.ToBullet());
     mRigidBody->setWorldTransform(transform);
-    mRigidBody->getMotionState()->setWorldTransform(transform);
 }
 
 void
 PhysicsActor::SetRotation(wQuaternion rotation, bool setWorld)
 {
     SetRotation(rotation.x, rotation.y, rotation.z, rotation.w, setWorld);
-}
-
-void
-PhysicsActor::SetSize(float x, float y, float z)
-{
-    FrameActor::SetSize(x, y, z);
-    auto colShape = mRigidBody->getCollisionShape();
-    colShape->setLocalScaling(btVector3(x, y, z));
-}
-
-void
-PhysicsActor::SetSize(wVector3 size)
-{
-    SetSize(size.x, size.y, size.z);
 }
 
 void
@@ -96,7 +86,7 @@ PhysicsActor::OnUpdate(double deltaTime)
 {
     // Update transform of Dali::Actor
     btTransform trans;
-    mRigidBody->getMotionState()->getWorldTransform(trans);
+    trans = mRigidBody->getWorldTransform();
     btVector3 pos = trans.getOrigin();
     btQuaternion rot = trans.getRotation();
 
@@ -107,13 +97,25 @@ PhysicsActor::OnUpdate(double deltaTime)
 }
 
 void
-PhysicsActor::ApplyForce(wVector3 force, wVector3 pos)
+PhysicsActor::ApplyForce(wVector3 force)
 {
-    mRigidBody->applyForce(force.ToBullet(), pos.ToBullet());
+    mRigidBody->applyCentralForce(force.ToBullet());
 }
 
 void
 PhysicsActor::ApplyTorque(wVector3 torque)
 {
 	mRigidBody->applyTorque(torque.ToBullet());
+}
+
+void
+PhysicsActor::SetVelocity(wVector3 vel)
+{
+    mRigidBody->setLinearVelocity(vel.ToBullet());
+}
+
+void
+PhysicsActor::RemoveRigidBody()
+{
+	mDynamicsWorld->removeRigidBody(mRigidBody);
 }

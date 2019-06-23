@@ -27,8 +27,8 @@ public:
     virtual void SetPosition(wVector3 position, bool setWorld=false);
     virtual void SetRotation(float x, float y, float z, float w, bool setWorld=false);
     virtual void SetRotation(wQuaternion rotation, bool setWorld=false);
-    virtual void SetSize(float x, float y, float z);
-    virtual void SetSize(wVector3 size);
+    void SetSize(float x, float y, float z);
+    void SetSize(wVector3 size);
     virtual void RotateBy(wQuaternion rot);
 
     // Hierarchy (It's not completed. Don't use this.)

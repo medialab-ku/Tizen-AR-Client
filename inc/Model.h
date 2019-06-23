@@ -5,6 +5,7 @@
 #include <bullet/btBulletDynamicsCommon.h>
 #include <string>
 #include <vector>
+#include "TypeWrappers.h"
 
 struct TextureInfo
 {
@@ -39,7 +40,7 @@ public:
     /*
      * Create collision shape for btRigidBody.
      */
-	virtual btCollisionShape* CreateCollisionShape();
+	virtual btCollisionShape* CreateCollisionShape(wVector3 size);
 
 private:
 	std::vector<TextureInfo> mTextures;

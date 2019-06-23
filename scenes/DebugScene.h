@@ -10,7 +10,6 @@
 #include "Assets.h"
 #include "obj-loader.h"
 #include "Model.h"
-#include <dlog.h>
 #include <sstream>
 
 using namespace std;
@@ -28,14 +27,15 @@ class AppleModel : public Model
                 return;
             }
 
-            SetMass(0.3f);
-            SetRollingFriction(0.05);
+            SetMass(1.5f);
+            SetFriction(0.7f);
+            SetRestitution(0.5f);
             
             Geometry geometry = obj.CreateGeometry(7, true);
 		    SetGeometry(geometry);
         }
 
-        btCollisionShape* CreateCollisionShape() override
+        btCollisionShape* CreateCollisionShape(wVector3 size) override
         {
         	ObjLoader obj;
 			if (!Assets::GetObj("Apple.obj", obj))
@@ -43,10 +43,10 @@ class AppleModel : public Model
 				return new btSphereShape(btScalar(0.4));
 			}
 
-			Dali::Vector3 size = obj.GetSize();
-			dlog_print(DLOG_DEBUG, "TIZENAR", "collision shape of apple : %f, %f, %f", size.x, size.y, size.z );
-
-            btCollisionShape *shape = new btSphereShape(btScalar((size.x+size.y+size.z) / 6.0f));
+			Dali::Vector3 objSize = obj.GetSize();
+			//dlog_print(DLOG_DEBUG, "TIZENAR", "collision shape of apple : %f, %f, %f", size.x, size.y, size.z );
+			double length = (size.x * objSize.x + size.y * objSize.y + size.z * objSize.z) / 6.0;
+            btCollisionShape *shape = new btSphereShape(btScalar(length));
             return shape;
         }
 
@@ -60,9 +60,9 @@ class DebugScene : public Scene
             : Scene(stage, camera, uiLayer, dynamicsWorld),
               mLightDir(wVector3(0.2, 1, -0.3))
         {
-        	dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene created");
+        	//dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene created");
         	InitUI();
-			dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene init ui");
+			//dlog_print(DLOG_DEBUG, "TIZENAR", "debug scene init ui");
 			// Debug_CreateContents();
 //			CreateWater();
 
@@ -136,7 +136,7 @@ class DebugScene : public Scene
                 {
                     ScreenToWorldResult stw = mCamera->ScreenToWorld(touchPos);
                     auto apple = CreateApple( worldToPlanePos(stw.worldPos) );
-                    apple->ApplyForce( worldToPlaneVec(stw.direction) * 10.0, wVector3(0, 0.015, 0));
+                    apple->ApplyForce( worldToPlaneVec(stw.direction) * 10.0);
                 }
             }
         }
@@ -176,14 +176,14 @@ class DebugScene : public Scene
 
             // PhysicsActor behaves as dynamic rigidbody
             // and it inherits FrameActor which is basic concept of object
-            auto cube1 = new PhysicsActor(mStage, cubeModel, mDynamicsWorld);
+            auto cube1 = new PhysicsActor(mStage, cubeModel, mDynamicsWorld, wVector3());
             cube1->SetName("Cube 1");
             cube1->SetPosition(-2, 0, 0);
             // Pass FrameActor so that it can be controlled and receive events
             AddActor(cube1);
 
             cubeModel.SetMass(1);
-            auto cube2 = new PhysicsActor(mStage, cubeModel, mDynamicsWorld);
+            auto cube2 = new PhysicsActor(mStage, cubeModel, mDynamicsWorld, wVector3());
             cube2->SetName("Cube 2");
             cube2->SetPosition(-1, 3, 1);
             AddActor(cube2);
@@ -228,10 +228,10 @@ class DebugScene : public Scene
             PrimitiveCube floorModel(mFloorShader ); // not using texture. only for consturctor
             floorModel.SetMass(0);
 
-            auto floorActor = new PhysicsActor(mStage, floorModel, mDynamicsWorld);
+            auto floorActor = new PhysicsActor(mStage, floorModel, mDynamicsWorld, wVector3(0.3, 0.05, 0.3));
             floorActor->SetName("Floor");
             floorActor->SetPosition(0, 0.025, 0);
-            floorActor->SetSize(0.3, 0.05, 0.3);
+            //floorActor->SetSize(0.3, 0.05, 0.3);
             AddActor(floorActor);
         }
 
@@ -250,23 +250,23 @@ class DebugScene : public Scene
             PrimitiveTexturedCube cubeModel("wood.png", mBlockShader);
             cubeModel.SetMass(0.5);
 
-            auto cube1 = new PhysicsActor(mStage, cubeModel, mDynamicsWorld);
+            auto cube1 = new PhysicsActor(mStage, cubeModel, mDynamicsWorld, wVector3(0.02, 0.08, 0.02));
             cube1->SetName("Cube 1");
             cube1->SetPosition(0.035, 0.15, 0.0);
-            cube1->SetSize(0.02, 0.08, 0.02);
+            // cube1->SetSize(0.02, 0.08, 0.02);
             // Pass FrameActor so that it can be controlled and receive events
             AddActor(cube1);
 
-            auto cube2 = new PhysicsActor(mStage, cubeModel, mDynamicsWorld);
+            auto cube2 = new PhysicsActor(mStage, cubeModel, mDynamicsWorld, wVector3(0.02, 0.08, 0.02));
             cube2->SetName("Cube 2");
             cube2->SetPosition(-0.035, 0.15, 0.0);
-            cube2->SetSize(0.02, 0.08, 0.02);
+            //cube2->SetSize(0.02, 0.08, 0.02);
             AddActor(cube2);
 
-            auto cube3 = new PhysicsActor(mStage, cubeModel, mDynamicsWorld);
+            auto cube3 = new PhysicsActor(mStage, cubeModel, mDynamicsWorld, wVector3(0.08, 0.02, 0.02));
             cube3->SetName("Cube 3");
             cube3->SetPosition(0.0, 0.25, 0.0);
-            cube3->SetSize(0.08, 0.02, 0.02);
+            //cube3->SetSize(0.08, 0.02, 0.02);
             AddActor(cube3);
         }
 
@@ -330,9 +330,9 @@ class DebugScene : public Scene
 
             AppleModel appleModel("Default_Palette.png", mAppleShader);
 
-            auto apple = new PhysicsActor(mStage, appleModel, mDynamicsWorld);
+            auto apple = new PhysicsActor(mStage, appleModel, mDynamicsWorld, wVector3(0.1, 0.1, 0.1));
             apple->SetPosition(pos);
-            apple->SetSize(0.1, 0.1, 0.1);
+            //apple->SetSize(0.1, 0.1, 0.1);
             AddActor(apple);
 
             return apple;
@@ -371,44 +371,44 @@ class DebugScene : public Scene
 			stringstream ss;
 
 			ss << "parent's local position: " << _parent->GetLocalPosition();
-			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			//dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
 			ss.str("");
 			ss << "parent's local rotation: " << _parent->GetLocalRotation();
-			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			//dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
 			ss.str("");
 			ss << "parent's plane position: " << _parent->GetPlanePosition();
-			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			//dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
 			ss.str("");
 			ss << "parent's plane rotation: " << _parent->GetPlaneRotation();
-			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			//dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
 			ss.str("");
 
 			ss << "child's local position: " << _child->GetLocalPosition();
-			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			//dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
 			ss.str("");
 			ss << "child's local rotation: " << _child->GetLocalRotation();
-			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			//dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
 			ss.str("");
 			ss << "child's plane position: " << _child->GetPlanePosition();
-			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			//dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
 			ss.str("");
 			ss << "child's plane rotation: " << _child->GetPlaneRotation();
-			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			//dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
 			ss.str("");
 
 			_child->SetPosition(0.1, 0.02, 0, true);
 			_child->SetRotation(wQuaternion(0, 0.707107, 0, 0.707107), true);
 			ss << "child's local position: " << _child->GetLocalPosition();
-			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			//dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
 			ss.str("");
 			ss << "child's local rotation: " << _child->GetLocalRotation();
-			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			//dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
 			ss.str("");
 			ss << "child's plane position: " << _child->GetPlanePosition();
-			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			//dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
 			ss.str("");
 			ss << "child's plane rotation: " << _child->GetPlaneRotation();
-			dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
+			//dlog_print(DLOG_DEBUG, "TIZENAR", ss.str().c_str());
 			ss.str("");
         }
 

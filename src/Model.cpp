@@ -23,9 +23,9 @@ Model::AddTexture(int index, const std::string name)
 }
 
 btCollisionShape*
-Model::CreateCollisionShape()
+Model::CreateCollisionShape(wVector3 size)
 {
     // Default is box shape
-    btCollisionShape *shape = new btBoxShape(btVector3(1, 1, 1));
+    btCollisionShape *shape = new btBoxShape(size.ToBullet());
     return shape;
 }

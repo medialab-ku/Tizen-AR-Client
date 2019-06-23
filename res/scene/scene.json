@@ -8,7 +8,7 @@
             "position": {
                 "x": 0.0,
                 "y": 0.0,
-                "z": 0.12
+                "z": 0.05
             },
             "rotation": {
                 "x": 0.0,
@@ -23,369 +23,12 @@
             }
         },
         {
-            "model": "block_wood2_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": 0.5,
-                "y": 0.6000000238418579,
-                "z": 0.5
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
-            "model": "block_wood2_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": -0.5,
-                "y": 0.6000000238418579,
-                "z": 0.5
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
-            "model": "block_wood2_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": -1.5,
-                "y": 0.6000000238418579,
-                "z": 0.5
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
-            "model": "block_wood2_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": 1.5,
-                "y": 0.6000000238418579,
-                "z": 0.5
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
-            "model": "block_wood2_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": 0.5,
-                "y": 0.6000000238418579,
-                "z": 1.5
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
-            "model": "block_wood2_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": -0.5,
-                "y": 0.6000000238418579,
-                "z": 1.5
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
-            "model": "block_wood2_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": -1.5,
-                "y": 0.6000000238418579,
-                "z": 1.5
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
-            "model": "block_wood2_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": 1.5,
-                "y": 0.6000000238418579,
-                "z": 1.5
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
-            "model": "block_wood2_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": 0.5,
-                "y": 0.6000000238418579,
-                "z": -0.5
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
-            "model": "block_wood2_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": -0.5,
-                "y": 0.6000000238418579,
-                "z": -0.5
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
-            "model": "block_wood2_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": -1.5,
-                "y": 0.6000000238418579,
-                "z": -0.5
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
-            "model": "block_wood2_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": 1.5,
-                "y": 0.6000000238418579,
-                "z": -0.5
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
-            "model": "block_wood2_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": 0.5,
-                "y": 0.6000000238418579,
-                "z": -1.5
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
-            "model": "block_wood2_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": -0.5,
-                "y": 0.6000000238418579,
-                "z": -1.5
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
-            "model": "block_wood2_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": -1.5,
-                "y": 0.6000000238418579,
-                "z": -1.5
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
-            "model": "block_wood2_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": 1.5,
-                "y": 0.6000000238418579,
-                "z": -1.5
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
             "model": "block_wood1_LOD0",
             "material": "texture",
             "texture": "cube_tex",
             "position": {
-                "x": 1.0,
-                "y": 1.600000023841858,
-                "z": 1.0
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
-            "model": "block_wood1_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": 1.0,
-                "y": 1.600000023841858,
+                "x": 0.75,
+                "y": 0.6000000238418579,
                 "z": 0.0
             },
             "rotation": {
@@ -405,9 +48,9 @@
             "material": "texture",
             "texture": "cube_tex",
             "position": {
-                "x": 1.0,
-                "y": 1.600000023841858,
-                "z": -1.0
+                "x": 2.25,
+                "y": 0.6000000238418579,
+                "z": 0.0
             },
             "rotation": {
                 "x": 0.0,
@@ -426,9 +69,9 @@
             "material": "texture",
             "texture": "cube_tex",
             "position": {
-                "x": 0.0,
-                "y": 1.600000023841858,
-                "z": 1.0
+                "x": -0.75,
+                "y": 0.6000000238418579,
+                "z": 0.0
             },
             "rotation": {
                 "x": 0.0,
@@ -444,6 +87,69 @@
         },
         {
             "model": "block_wood1_LOD0",
+            "material": "texture",
+            "texture": "cube_tex",
+            "position": {
+                "x": -2.25,
+                "y": 0.6000000238418579,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        {
+            "model": "block_wood1_LOD0",
+            "material": "texture",
+            "texture": "cube_tex",
+            "position": {
+                "x": 0.75,
+                "y": 2.5999999046325685,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        {
+            "model": "block_wood1_LOD0",
+            "material": "texture",
+            "texture": "cube_tex",
+            "position": {
+                "x": -0.75,
+                "y": 2.5999999046325685,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        {
+            "model": "block_wood2_LOD0",
             "material": "texture",
             "texture": "cube_tex",
             "position": {
@@ -464,53 +170,11 @@
             }
         },
         {
-            "model": "block_wood1_LOD0",
+            "model": "block_wood2_LOD0",
             "material": "texture",
             "texture": "cube_tex",
             "position": {
-                "x": 0.0,
-                "y": 1.600000023841858,
-                "z": -1.0
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
-            "model": "block_wood1_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": -1.0,
-                "y": 1.600000023841858,
-                "z": 1.0
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
-            "model": "block_wood1_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": -1.0,
+                "x": 1.5,
                 "y": 1.600000023841858,
                 "z": 0.0
             },
@@ -527,13 +191,13 @@
             }
         },
         {
-            "model": "block_wood1_LOD0",
+            "model": "block_wood2_LOD0",
             "material": "texture",
             "texture": "cube_tex",
             "position": {
-                "x": -1.0,
+                "x": -1.5,
                 "y": 1.600000023841858,
-                "z": -1.0
+                "z": 0.0
             },
             "rotation": {
                 "x": 0.0,
@@ -549,90 +213,6 @@
         },
         {
             "model": "block_wood2_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": 0.5,
-                "y": 2.5999999046325685,
-                "z": 0.5
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
-            "model": "block_wood2_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": -0.5,
-                "y": 2.5999999046325685,
-                "z": 0.5
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
-            "model": "block_wood2_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": 0.5,
-                "y": 2.5999999046325685,
-                "z": -0.5
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
-            "model": "block_wood2_LOD0",
-            "material": "texture",
-            "texture": "cube_tex",
-            "position": {
-                "x": -0.5,
-                "y": 2.5999999046325685,
-                "z": -0.5
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            }
-        },
-        {
-            "model": "block_wood1_LOD0",
             "material": "texture",
             "texture": "cube_tex",
             "position": {
@@ -658,7 +238,7 @@
             "texture": "color-atlas",
             "position": {
                 "x": 0.0,
-                "y": 5.5,
+                "y": 5.1,
                 "z": 0.0
             },
             "rotation": {

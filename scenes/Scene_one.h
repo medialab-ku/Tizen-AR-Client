@@ -10,7 +10,6 @@
 #include "Assets.h"
 #include "obj-loader.h"
 #include "Model.h"
-#include <dlog.h>
 #include <sstream>
 #include <map>
 #include <json/json.h>
@@ -42,17 +41,26 @@ public:
 
 	void OnStart() override
 	{
-		 ParseRecipe();
-		 dlog_print(DLOG_DEBUG, "TIZENAR", "recipe parsed");
-		 PlaceObjects();
-		 dlog_print(DLOG_DEBUG, "TIZENAR", "object placed");
-		 CreateFence();
-		 dlog_print(DLOG_DEBUG, "TIZENAR", "fence placed");
+        // a1 = CreateSphere( wVector3(-0.05, 0.2, 0));
+        // a2 = CreateSphere( wVector3(0.05, 0.2, 0));
+        // a1->SetVelocity(wVector3(0.1, 0, 0));
+        // a2->SetVelocity(wVector3(-0.1, 0, 0));
+        ParseRecipe();
+        // //dlog_print(DLOG_DEBUG, "TIZENAR", "recipe parsed");
+        PlaceObjects();
+        // //dlog_print(DLOG_DEBUG, "TIZENAR", "object placed");
+        CreateFence();
+        // //dlog_print(DLOG_DEBUG, "TIZENAR", "fence placed");
+        InitApple();
+
+        // cout << "scene creation finished" << endl;
 	}
 
 	void OnUpdate(double deltaTime) override
 	{
-
+        // cout << "frame start, deltaTime : " << deltaTime << endl;
+        // a1->Debug();
+        // a2->Debug();
 	}
 
 	void OnKeyEvent(const Dali::KeyEvent &event) override
@@ -68,16 +76,19 @@ public:
 			if (touch.GetState(0) == PointState::DOWN)
 			{
 				ScreenToWorldResult stw = mCamera->ScreenToWorld(touchPos);
-				auto apple = CreateApple( worldToPlanePos(stw.worldPos) );
+				//auto apple = CreateCube( worldToPlanePos(stw.worldPos) );
+                auto apple = CreateApple( worldToPlanePos(stw.worldPos) );
 				appleList.push_back(apple);
-				if(appleList.size() > 8)
+				if(appleList.size() > 100)
 				{
 					auto a = *(appleList.begin());
+					a->RemoveRigidBody();
 					RemoveActor(a);
 					appleList.erase(appleList.begin());
 				}
-				//apple->ApplyTorque(wVector3(-1.3f, 0, 0));
-				apple->ApplyForce( worldToPlaneVec(stw.direction) * 10.0, wVector3(0, 0, 0));
+                apple->SetVelocity(worldToPlaneVec(stw.direction) * 1.2f);
+				//apple->ApplyTorque(wVector3(-0.5f, 0, 0));
+				//apple->ApplyForce( worldToPlaneVec(stw.direction) * 70);
 			}
 		}
 	}
@@ -87,10 +98,10 @@ private:
 	{
 		std::string data;
 		ReadRecipe("scene/scene.json", data);
-		//dlog_print(DLOG_DEBUG, "TIZENAR", data.c_str());
+		////dlog_print(DLOG_DEBUG, "TIZENAR", data.c_str());
 		Json::Reader reader;
-		if(!reader.parse(data, root))
-			dlog_print(DLOG_DEBUG, "TIZENAR", "failed to parse json");
+		if(!reader.parse(data, root));
+			//dlog_print(DLOG_DEBUG, "TIZENAR", "failed to parse json");
 	}
 
 	void PlaceObjects()
@@ -124,41 +135,93 @@ private:
 
 				std::string textureName = objs[i]["texture"].asString() + ".png";
 				PrimitiveObj model(textureName, shader, modelName + ".obj");
-				model.SetFriction(0.3);
-				model.SetRollingFriction(0.01);
-				model.SetSpinningFriction(0.01);
 				objModelMap.insert(make_pair(modelName, model));
 				it = objModelMap.find(modelName);
 			}
 
 			PrimitiveObj model = it->second;
 			FrameActor* actor;
+            bool isPhysicsActor = false;
 			if(modelName == "block_wood1_LOD0" || modelName == "block_wood2_LOD0" )
 			{
-				if(modelName != "terrain-plane-plain") model.SetMass(0.2f);
-				actor = new PhysicsActor(mStage, model, mDynamicsWorld);
+                isPhysicsActor = true;
+
+				model.SetMass(1.5f);
+                model.SetFriction(0.7f);
+                model.SetRestitution(0.5f);
+
+                Json::Value scaleVal = objs[i]["scale"];
+                wVector3 scale(scaleVal["x"].asFloat(), scaleVal["y"].asFloat(), scaleVal["z"].asFloat());
+
+				actor = new PhysicsActor(mStage, model, mDynamicsWorld, scale * globalScale);
 			}
 			else actor = new GraphicsActor(mStage, model);
 
 			Json::Value posVal = objs[i]["position"];
 			wVector3 pos(posVal["x"].asFloat(), posVal["y"].asFloat(), posVal["z"].asFloat());
-			dlog_print(DLOG_DEBUG, "TIZENAR", "object pos : %f, %f, %f", pos.x, pos.y, pos.z);
+			//dlog_print(DLOG_DEBUG, "TIZENAR", "object pos : %f, %f, %f", pos.x, pos.y, pos.z);
 			actor->SetPosition(pos * globalScale);
 
 			Json::Value rotVal = objs[i]["rotation"];
 			wQuaternion rot(rotVal["x"].asFloat(), rotVal["y"].asFloat(), rotVal["z"].asFloat(), rotVal["w"].asFloat());
 			actor->SetRotation(rot);
 
-			Json::Value scaleVal = objs[i]["scale"];
-			wVector3 scale(scaleVal["x"].asFloat(), scaleVal["y"].asFloat(), scaleVal["z"].asFloat());
-			actor->SetSize(scale * globalScale);
+            if(!isPhysicsActor)
+            {
+                Json::Value scaleVal = objs[i]["scale"];
+                wVector3 scale(scaleVal["x"].asFloat(), scaleVal["y"].asFloat(), scaleVal["z"].asFloat());
+                actor->SetSize(scale * globalScale);
+            }
 
 			AddActor(actor);
 		}
 	}
 
-	PhysicsActor* CreateApple(wVector3 pos)
+	PhysicsActor* CreateCube(wVector3 pos)
 	{
+		Dali::Shader shader;
+		Assets::GetShader("vertexPhong.glsl", "fragmentPhong.glsl", shader);
+		shader.RegisterProperty("uLightPos", mLightDir.ToDali());
+		shader.RegisterProperty("uViewPos", Dali::Vector3(0, 0, 0));
+		shader.RegisterProperty("uLightColor", Dali::Vector3(1, 1, 1));
+
+		PrimitiveObj model("cube_tex.png", shader, "block_wood2_LOD0.obj");
+
+		model.SetMass(1.4f);
+        model.SetFriction(0.5f);
+        model.SetRollingFriction(0.005f);
+		auto actor = new PhysicsActor(mStage, model, mDynamicsWorld, wVector3(0.02, 0.02, 0.02));
+		actor->SetPosition(pos);
+		//actor->SetSize(0.02, 0.02, 0.02);
+
+		AddActor(actor);
+		return actor;
+	}
+
+    PhysicsActor* CreateSphere(wVector3 pos)
+	{
+		Dali::Shader shader;
+		Assets::GetShader("vertexPhong.glsl", "fragmentPhong.glsl", shader);
+		shader.RegisterProperty("uLightPos", mLightDir.ToDali());
+		shader.RegisterProperty("uViewPos", Dali::Vector3(0, 0, 0));
+		shader.RegisterProperty("uLightColor", Dali::Vector3(1, 1, 1));
+
+        PrimitiveSphere model("001.jpg", shader);
+		//PrimitiveObj model("cube_tex.png", shader, "block_wood2_LOD0.obj");
+
+		model.SetMass(0.1f);
+        model.SetFriction(0.1f);
+        model.SetRestitution(1.f);
+		auto actor = new PhysicsActor(mStage, model, mDynamicsWorld, wVector3(0.06, 0.06, 0.06));
+		actor->SetPosition(pos);
+		// actor->SetSize(0.06, 0.06, 0.06);
+
+		AddActor(actor);
+		return actor;
+	}
+
+    void InitApple()
+    {
         Dali::Shader mAppleShader;
 		mAppleShader = LoadShaders("vertexPhong.glsl", "fragmentPhong.glsl");
 		mAppleShader.RegisterProperty("uLightPos", mLightDir.ToDali());
@@ -167,14 +230,18 @@ private:
 		ObjLoader obj;
 		if (!Assets::GetObj("Apple.obj", obj))
 		{
-			return nullptr;
+			return;
 		}
 
-		AppleModel appleModel("Default_Palette.png", mAppleShader);
+		appleModel = new AppleModel("Default_Palette.png", mAppleShader);
+    }
 
-		auto apple = new PhysicsActor(mStage, appleModel, mDynamicsWorld);
+	PhysicsActor* CreateApple(wVector3 pos)
+	{
+		auto apple = new PhysicsActor(mStage, *appleModel, mDynamicsWorld,  wVector3(0.03, 0.03, 0.03));
 		apple->SetPosition(pos);
-		apple->SetSize(0.03, 0.03, 0.03);
+        apple->SetRotation(0, 0, 1, 0);
+		//apple->SetSize(0.03, 0.03, 0.03);
 		AddActor(apple);
 
 		return apple;
@@ -185,32 +252,36 @@ private:
 		float globalScale = root["globalScale"].asFloat();
 
 		Dali::Shader blockShader;
-		Assets::GetShader("vertexColor.glsl", "fragmentColor.glsl", blockShader);
-		FenceModel cube(blockShader);
+		//Assets::GetShader("vertexColor.glsl", "fragmentColor.glsl", blockShader);
+		//FenceModel cube(blockShader);
+        Assets::GetShader("vertexPhong.glsl", "fragmentPhong.glsl", blockShader);
+        PrimitiveTexturedCube cube("wood.png", blockShader);
 
-		PhysicsActor* fence1 = new PhysicsActor(mStage, cube, mDynamicsWorld);
-		fence1->SetPosition(wVector3(0.2265606, 1.185877, -7.797238)*globalScale);
-		fence1->SetSize(wVector3(15.55178, 2.212319, 0.4080844)*globalScale);
-		AddActor(fence1);
+		// PhysicsActor* fence1 = new PhysicsActor(mStage, cube, mDynamicsWorld);
+		// fence1->SetPosition(wVector3(0.2265606, 1.185877, -7.797238)*globalScale);
+		// fence1->SetSize(wVector3(15.55178, 2.212319, 0.4080844)*globalScale);
+		// AddActor(fence1);
 
-		PhysicsActor* fence2 = new PhysicsActor(mStage, cube, mDynamicsWorld);
-		fence2->SetPosition(wVector3(0.2265606, 1.185877, 7.766111)*globalScale);
-		fence2->SetSize(wVector3(15.55178, 2.212319, 0.4664226)*globalScale);
-		AddActor(fence2);
+		// PhysicsActor* fence2 = new PhysicsActor(mStage, cube, mDynamicsWorld);
+		// fence2->SetPosition(wVector3(0.2265606, 1.185877, 7.766111)*globalScale);
+		// fence2->SetSize(wVector3(15.55178, 2.212319, 0.4664226)*globalScale);
+		// AddActor(fence2);
 
-		PhysicsActor* fence3 = new PhysicsActor(mStage, cube, mDynamicsWorld);
-		fence3->SetPosition(wVector3(-7.541017, 1.185877, 0.1334667)*globalScale);
-		fence3->SetSize(wVector3(0.4136515, 2.212319, 15.73171)*globalScale);
-		AddActor(fence3);
+		// PhysicsActor* fence3 = new PhysicsActor(mStage, cube, mDynamicsWorld);
+		// fence3->SetPosition(wVector3(-7.541017, 1.185877, 0.1334667)*globalScale);
+		// fence3->SetSize(wVector3(0.4136515, 2.212319, 15.73171)*globalScale);
+		// AddActor(fence3);
 
-		PhysicsActor* fence4 = new PhysicsActor(mStage, cube, mDynamicsWorld);
-		fence4->SetPosition(wVector3(8.132362, 1.185877, 0.1334667)*globalScale);
-		fence4->SetSize(wVector3(0.5355411, 2.212319, 15.73171)*globalScale);
-		AddActor(fence4);
+		// PhysicsActor* fence4 = new PhysicsActor(mStage, cube, mDynamicsWorld);
+		// fence4->SetPosition(wVector3(8.132362, 1.185877, 0.1334667)*globalScale);
+		// fence4->SetSize(wVector3(0.5355411, 2.212319, 15.73171)*globalScale);
+		// AddActor(fence4);
 
-		PhysicsActor* floor = new PhysicsActor(mStage, cube, mDynamicsWorld);
+        cube.SetFriction(0.7f);
+
+		PhysicsActor* floor = new PhysicsActor(mStage, cube, mDynamicsWorld, wVector3(13, 5, 13) * globalScale);
 		floor->SetPosition(wVector3(0, -5, 0) * globalScale);
-		floor->SetSize(wVector3(15.8, 5, 15.8) * globalScale);
+		//floor->SetSize(wVector3(13, 5, 13) * globalScale);
 		AddActor(floor);
 	}
 
@@ -220,6 +291,13 @@ private:
 	std::map<std::string, PrimitiveObj> objModelMap;
 
 	std::vector<PhysicsActor*> appleList;
+
+    AppleModel* appleModel;
+
+
+    // Debug
+    PhysicsActor* a1;
+    PhysicsActor* a2;
 };
 
 #endif

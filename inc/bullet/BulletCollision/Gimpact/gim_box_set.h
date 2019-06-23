@@ -37,7 +37,28 @@ email: projectileman@yahoo.com
 #include "gim_radixsort.h"
 #include "gim_box_collision.h"
 #include "gim_tri_collision.h"
-#include "gim_pair.h"
+
+//! Overlapping pair
+struct GIM_PAIR
+{
+	GUINT m_index1;
+	GUINT m_index2;
+	GIM_PAIR()
+	{
+	}
+
+	GIM_PAIR(const GIM_PAIR& p)
+	{
+		m_index1 = p.m_index1;
+		m_index2 = p.m_index2;
+	}
+
+	GIM_PAIR(GUINT index1, GUINT index2)
+	{
+		m_index1 = index1;
+		m_index2 = index2;
+	}
+};
 
 //! A pairset array
 class gim_pair_set : public gim_array<GIM_PAIR>

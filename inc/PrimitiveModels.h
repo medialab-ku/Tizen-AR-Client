@@ -279,6 +279,13 @@ public:
 
 		SetGeometry(geometry);
     }
+
+    btCollisionShape* CreateCollisionShape(wVector3 size) override
+	{
+		//assume that every elements of size is equal.
+		btCollisionShape *shape = new btSphereShape(btScalar(0.5 * size.x));
+		return shape;
+	}
 };
 
 class PrimitiveObj : public Model
@@ -299,19 +306,19 @@ public:
 		SetGeometry(geometry);
     }
 
-    btCollisionShape* CreateCollisionShape() override
+    btCollisionShape* CreateCollisionShape(wVector3 size) override
     {
     	ObjLoader obj;
-    	if (!Assets::GetObj(_objName, obj))
+		if (!Assets::GetObj(_objName, obj))
 		{
-			return new btBoxShape(btVector3(1, 1, 1));
+			std::cout << "can't find object to make collision shape" << std::endl;
+			return new btBoxShape(btVector3(0.5 * size.x, 0.5 * size.y, 0.5 * size.z));
 		}
 
-    	Dali::Vector3 size = obj.GetSize();
-    	Dali::Vector3 center = obj.GetCenter();
-    	dlog_print(DLOG_DEBUG, "TIZENAR", "collision shape of %s : %f, %f, %f", _objName.c_str(), size.x, size.y, size.z );
-    	dlog_print(DLOG_DEBUG, "TIZENAR", "collision center of %s : %f, %f, %f", _objName.c_str(), center.x, center.y, center.z );
-    	btCollisionShape *shape = new btBoxShape(btVector3(size.x/2.0f, size.y/2.0f, size.z/2.0f));
+		Dali::Vector3 objSize = obj.GetSize();
+		//dlog_print(DLOG_DEBUG, "TIZENAR", "collision shape of %s : %f, %f, %f", _objName.c_str(), size.x, size.y, size.z );
+		//dlog_print(DLOG_DEBUG, "TIZENAR", "collision center of %s : %f, %f, %f", _objName.c_str(), center.x, center.y, center.z );
+		btCollisionShape *shape = new btBoxShape(btVector3(size.x * objSize.x, size.y * objSize.y, size.z * objSize.z) / 2.0f);
 		return shape;
     }
 private:

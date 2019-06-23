@@ -101,8 +101,6 @@ protected:
 
 	int m_userIndex;
 
-	int m_userIndex3;
-
 	///time of impact calculation
 	btScalar m_hitFraction;
 
@@ -528,11 +526,6 @@ public:
 		return m_userIndex2;
 	}
 
-	int getUserIndex3() const
-	{
-		return m_userIndex3;
-	}
-
 	///users can point to their objects, userPointer is not used by Bullet
 	void setUserPointer(void* userPointer)
 	{
@@ -548,11 +541,6 @@ public:
 	void setUserIndex2(int index)
 	{
 		m_userIndex2 = index;
-	}
-
-	void setUserIndex3(int index)
-	{
-		m_userIndex3 = index;
 	}
 
 	int getUpdateRevisionInternal() const

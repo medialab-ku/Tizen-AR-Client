@@ -239,6 +239,7 @@ private:
         btSequentialImpulseConstraintSolver *solver = new btSequentialImpulseConstraintSolver();
         mDynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, cfg);
         mDynamicsWorld->setGravity(btVector3(0, -9.81, 0));
+        mDynamicsWorld->getSolverInfo().m_solverMode = SOLVER_USE_WARMSTARTING | SOLVER_SIMD | SOLVER_DISABLE_VELOCITY_DEPENDENT_FRICTION_DIRECTION|SOLVER_USE_2_FRICTION_DIRECTIONS|SOLVER_ENABLE_FRICTION_DIRECTION_CACHING | SOLVER_RANDMIZE_ORDER;
     }
 
     void InitUILayer()
