@@ -28,7 +28,7 @@ class AppleModel : public Model
             }
 
             SetMass(1.5f);
-            SetFriction(0.7f);
+            SetFriction(0.4f);
             SetRestitution(0.5f);
             
             Geometry geometry = obj.CreateGeometry(7, true);

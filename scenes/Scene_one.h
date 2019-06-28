@@ -147,7 +147,7 @@ private:
                 isPhysicsActor = true;
 
 				model.SetMass(1.5f);
-                model.SetFriction(0.7f);
+                model.SetFriction(0.5f);
                 model.SetRestitution(0.5f);
 
                 Json::Value scaleVal = objs[i]["scale"];
@@ -252,36 +252,32 @@ private:
 		float globalScale = root["globalScale"].asFloat();
 
 		Dali::Shader blockShader;
-		//Assets::GetShader("vertexColor.glsl", "fragmentColor.glsl", blockShader);
-		//FenceModel cube(blockShader);
-        Assets::GetShader("vertexPhong.glsl", "fragmentPhong.glsl", blockShader);
-        PrimitiveTexturedCube cube("wood.png", blockShader);
+		Assets::GetShader("vertexColor.glsl", "fragmentColor.glsl", blockShader);
+		FenceModel cube(blockShader);
+		// Assets::GetShader("vertexPhong.glsl", "fragmentPhong.glsl", blockShader);
+		// PrimitiveTexturedCube cube("wood.png", blockShader);
 
-		// PhysicsActor* fence1 = new PhysicsActor(mStage, cube, mDynamicsWorld);
-		// fence1->SetPosition(wVector3(0.2265606, 1.185877, -7.797238)*globalScale);
-		// fence1->SetSize(wVector3(15.55178, 2.212319, 0.4080844)*globalScale);
-		// AddActor(fence1);
+		PhysicsActor* fence1 = new PhysicsActor(mStage, cube, mDynamicsWorld, wVector3(8.915535, 1, 0.2026377) * globalScale);
+		fence1->SetPosition(wVector3(0, 1.5, -6.7) * globalScale);
+		AddActor(fence1);
 
-		// PhysicsActor* fence2 = new PhysicsActor(mStage, cube, mDynamicsWorld);
-		// fence2->SetPosition(wVector3(0.2265606, 1.185877, 7.766111)*globalScale);
-		// fence2->SetSize(wVector3(15.55178, 2.212319, 0.4664226)*globalScale);
-		// AddActor(fence2);
+		PhysicsActor* fence2 = new PhysicsActor(mStage, cube, mDynamicsWorld, wVector3(8.915535, 1, 0.2026377) * globalScale);
+		fence2->SetPosition(wVector3(0, 1.5, 6.65) * globalScale);
+		AddActor(fence2);
 
-		// PhysicsActor* fence3 = new PhysicsActor(mStage, cube, mDynamicsWorld);
-		// fence3->SetPosition(wVector3(-7.541017, 1.185877, 0.1334667)*globalScale);
-		// fence3->SetSize(wVector3(0.4136515, 2.212319, 15.73171)*globalScale);
-		// AddActor(fence3);
+		PhysicsActor* fence3 = new PhysicsActor(mStage, cube, mDynamicsWorld, wVector3(0.2026377, 1, 7.79048) * globalScale);
+		fence3->SetPosition(wVector3(7.85, 1.5, 0) * globalScale);
+		AddActor(fence3);
 
-		// PhysicsActor* fence4 = new PhysicsActor(mStage, cube, mDynamicsWorld);
-		// fence4->SetPosition(wVector3(8.132362, 1.185877, 0.1334667)*globalScale);
-		// fence4->SetSize(wVector3(0.5355411, 2.212319, 15.73171)*globalScale);
-		// AddActor(fence4);
+		PhysicsActor* fence4 = new PhysicsActor(mStage, cube, mDynamicsWorld, wVector3(0.2026377, 1, 7.79048) * globalScale);
+		fence4->SetPosition(wVector3(-7.9, 1.5, 0) * globalScale);
+		AddActor(fence4);
 
-        cube.SetFriction(0.7f);
+		cube.SetFriction(0.5f);
+		cube.SetRestitution(0.2f);
 
-		PhysicsActor* floor = new PhysicsActor(mStage, cube, mDynamicsWorld, wVector3(13, 5, 13) * globalScale);
+		PhysicsActor* floor = new PhysicsActor(mStage, cube, mDynamicsWorld, wVector3(9, 5, 9) * globalScale);
 		floor->SetPosition(wVector3(0, -5, 0) * globalScale);
-		//floor->SetSize(wVector3(13, 5, 13) * globalScale);
 		AddActor(floor);
 	}
 
